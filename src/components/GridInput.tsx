@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import useMusicStore, { GridNote, Phrase } from '../store'; // Ensure Phrase is imported
 
 const GRID_HEIGHT = 10; // Number of rows for MIDI pitches (e.g., 0-127)
-const GRID_WIDTH = 16;  // Number of columns for beats (e.g., 0-15)
 const CELL_PT = 10;
 
 interface GridInputProps {
@@ -25,13 +24,13 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
 
     // Local state to manage notes on the grid
     const [gridNotes, setGridNotes] = useState<boolean[][]>(
-        Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(false))
+        Array(GRID_HEIGHT).fill(null).map(() => Array(phrase ? phrase.numColumns : 0).fill(false)) // Use phrase.numColumns for correct initialization
     );
 
     // Sync gridNotes with the phrase's notes when the phrase changes
     useEffect(() => {
         if (phrase) {
-            const newGridNotes = Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(false));
+            const newGridNotes = Array(GRID_HEIGHT).fill(null).map(() => Array(phrase.numColumns).fill(false));
             phrase.notes.forEach(note => {
                 newGridNotes[note.pitch][note.startTime] = true; // Mark the note's position as active
             });
@@ -51,17 +50,23 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                 row.map((isActive, beatIndex) => (isActive ? { pitch: pitchIndex, startTime: beatIndex } : null)).filter(Boolean) as GridNote[]
             );
 
-            setPhrase(gridIndex, { notes: newNotes });
+            // Ensure numColumns is included in the updated phrase
+            const updatedPhrase: Phrase = {
+                notes: newNotes,
+                numColumns: phrase.numColumns, // Maintain the existing numColumns value
+            };
+
+            setPhrase(gridIndex, updatedPhrase);
         }
     };
 
     return (
         <div>
             <h3>Phrase {gridIndex + 1}</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${GRID_WIDTH}, ${CELL_PT}pt)` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${phrase ? phrase.numColumns : 0}, ${CELL_PT}pt)` }}>
                 {Array.from({ length: GRID_HEIGHT }).map((_, pitch) => (
                     // Directly mapping the pitches to grid cells
-                    Array.from({ length: GRID_WIDTH }).map((_, beat) => (
+                    Array.from({ length: phrase ? phrase.numColumns : 0 }).map((_, beat) => (
                         <div
                             key={`${pitch}-${beat}`}
                             onClick={() => toggleNote(pitch, beat)}

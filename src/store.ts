@@ -9,24 +9,38 @@ export interface GridNote {
 
 export interface Phrase {
     notes: GridNote[];
+    numColumns: number;
 }
 
 interface MusicState {
     bpm: number;
     setBPM: (newBPM: number) => void;
     phrases: Phrase[];
-    setPhrase: (index: number, phrase: Phrase) => void;
+    setNumColumns: (gridIndex: number, numColumns: number) => void;
+    setPhrase: (gridIndex: number, phrase: Phrase) => void; // Specify that phrase is of type Phrase
 }
 
 // Create the store
 const useMusicStore = create<MusicState>((set) => ({
     bpm: 120,
-    setBPM: (newBPM) => set({ bpm: newBPM }),
-    phrases: [{ notes: [] }], // Initialize with one empty phrase
-    setPhrase: (index, phrase) =>
+    setBPM: (newBPM: number) => set({ bpm: newBPM }), // Type for newBPM
+    phrases: [
+        { notes: [], numColumns: 3 },
+        { notes: [], numColumns: 4 },
+    ],
+    setNumColumns: (gridIndex: number, numColumns: number) =>
         set((state) => {
             const newPhrases = [...state.phrases];
-            newPhrases[index] = phrase;
+            newPhrases[gridIndex] = {
+                ...newPhrases[gridIndex],
+                numColumns,
+            };
+            return { phrases: newPhrases };
+        }),
+    setPhrase: (gridIndex: number, phrase: Phrase) =>
+        set((state) => {
+            const newPhrases = [...state.phrases];
+            newPhrases[gridIndex] = phrase;
             return { phrases: newPhrases };
         }),
 }));
