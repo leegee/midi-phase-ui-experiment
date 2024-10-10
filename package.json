@@ -1,5 +1,6 @@
 {
   "name": "midi-phase-ui",
+  "description": "A React UI to experiment with real-time phasing of MIDI rhythms",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
