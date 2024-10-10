@@ -3,19 +3,17 @@
 import { useEffect, useState } from 'react';
 
 const useMIDI = () => {
-    const [midiAccess, setMidiAccess] = useState<WebMidi.MIDIAccess | null>(null);
     const [inputs, setInputs] = useState<WebMidi.MIDIInput[]>([]);
     const [outputs, setOutputs] = useState<WebMidi.MIDIOutput[]>([]);
     const [selectedInput, setSelectedInput] = useState<WebMidi.MIDIInput | null>(null);
     const [selectedOutput, setSelectedOutput] = useState<WebMidi.MIDIOutput | null>(null);
-    const [error, setError] = useState<string | null>(null); // Add error state
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const getMIDI = async () => {
             try {
                 if ('requestMIDIAccess' in navigator) {
                     const access = await navigator.requestMIDIAccess();
-                    setMidiAccess(access);
 
                     const inputDevices = Array.from(access.inputs.values());
                     const outputDevices = Array.from(access.outputs.values());
@@ -34,14 +32,22 @@ const useMIDI = () => {
                 }
             } catch (err) {
                 console.error('Failed to get MIDI access', err);
-                setError('Failed to get MIDI access'); // Set the error message
+                setError('Failed to get MIDI access');
             }
         };
 
         getMIDI();
     }, []);
 
-    return { midiAccess, inputs, outputs, selectedInput, setSelectedInput, selectedOutput, setSelectedOutput, error }; // Include error in the return
+
+    const sendMIDIMessage = (message: number[]) => {
+        if (selectedOutput) {
+            selectedOutput.send(message);
+        }
+    };
+
+    return { sendMIDIMessage, inputs, outputs, selectedInput, setSelectedInput, selectedOutput, setSelectedOutput, error };
 };
+
 
 export default useMIDI;
