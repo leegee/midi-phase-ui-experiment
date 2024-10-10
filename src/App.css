@@ -10,7 +10,8 @@ main {
   gap: 1em
 }
 
-.grid-input {
+.grid-wrapper {
   display: flex;
   flex-direction: column; 
+  border: 1pt solid grey;
 }

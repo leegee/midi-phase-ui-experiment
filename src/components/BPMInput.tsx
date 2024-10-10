@@ -21,7 +21,7 @@ const BPMInput: React.FC = () => {
     };
 
     return (
-        <div>
+        <section className='padded-container'>
             <label>
                 BPM:
                 <input
@@ -34,7 +34,7 @@ const BPMInput: React.FC = () => {
                     max={300}
                 />
             </label>
-        </div>
+        </section>
     );
 };
 

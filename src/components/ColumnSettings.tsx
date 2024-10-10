@@ -21,7 +21,7 @@ const ColumnSettings: React.FC<ColumnSettingsProps> = ({ gridIndex }) => {
     };
 
     return (
-        <div>
+        <section className='padded-container'>
             <label htmlFor={`num-columns-${gridIndex}`}>Size:</label>
             <input
                 className='column-size-input'
@@ -32,7 +32,7 @@ const ColumnSettings: React.FC<ColumnSettingsProps> = ({ gridIndex }) => {
                 min={1}
                 max={32}
             />
-        </div>
+        </section>
     );
 };
 

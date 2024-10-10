@@ -7,8 +7,7 @@ const DeviceSelector: React.FC = () => {
     const { inputs, outputs, selectedInput, setSelectedInput, selectedOutput, setSelectedOutput } = useMIDI();
 
     return (
-        <div>
-            <h2>MIDI Devices</h2>
+        <section className='padded-container'>
             <label>
                 <select
                     value={selectedInput ? selectedInput.id : ''}
@@ -41,7 +40,7 @@ const DeviceSelector: React.FC = () => {
                     ))}
                 </select>
             </label>
-        </div>
+        </section>
     );
 };
 

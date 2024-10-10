@@ -7,9 +7,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   --midi-app-input-margin-left: 0.6em;
+  --midi-app-container-padding: 0.6em;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.padded-container {
+  margin: var(--midi-app-container-padding);
 }

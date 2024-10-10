@@ -61,8 +61,8 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     };
 
     return (
-        <div
-            className="grid-component"
+        <section
+            className="grid-component padded-container"
             style={{ gridTemplateColumns: `repeat(${phrase ? phrase.numColumns : 0}, var(--cell-size))` }}
         >
             {Array.from({ length: GRID_HEIGHT }).map((_, pitch) => (
@@ -75,7 +75,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                     />
                 ))
             ))}
-        </div>
+        </section>
     );
 };
 

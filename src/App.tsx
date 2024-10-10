@@ -31,8 +31,7 @@ const App: React.FC = () => {
 
         <div className="grid-components-container">
           {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (
-            <section className="grid-input" key={gridIndex}>
-              <h3>Phrase {gridIndex + 1}</h3>
+            <section className="grid-wrapper" key={gridIndex}>
               <ColumnSettings gridIndex={gridIndex} />
               <GridInput gridIndex={gridIndex} />
             </section>
