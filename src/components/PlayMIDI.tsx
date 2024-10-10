@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 import useMIDI from '../hooks/useMIDI';
-import useStore from '../store';
-import type { GridNote } from '../store';
+import useStore, { type GridNote } from '../store';
 
 const NOTE_ON = 0x90;
 const NOTE_OFF = 0x80;
@@ -14,7 +13,7 @@ const PlayPauseButton: React.FC = () => {
     const phrases = useStore((state) => state.phrases);
 
     const audioContextRef = useRef<AudioContext | null>(null);
-    const intervalDuration = (60 / bpm);  // Time per beat in seconds
+    const intervalDuration = (60 / bpm);
 
     const scheduleNotes = useCallback((startTime: number) => {
         const currentTime = window.performance.now();
