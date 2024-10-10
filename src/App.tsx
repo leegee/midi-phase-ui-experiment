@@ -1,26 +1,29 @@
+// src/App.tsx
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import BPMInput from './components/BPMInput';
+import GridInput from './components/GridInput';
 
-function App() {
+const NUM_GRIDS = 2; // Set the number of grids (can be adjusted in the future)
+
+const App: React.FC = () => {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Minimalist Music App</h1>
+
+      {/* BPM Input Component */}
+      <BPMInput />
+
+      {/* Render multiple GridInput components */}
+      {Array.from({ length: NUM_GRIDS }).map((_, index) => (
+        <GridInput key={index} gridIndex={index} />
+      ))}
+
+      {/* Placeholder for Combined View */}
+      <div>
+        <h2>Combined View (Coming Soon)</h2>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
