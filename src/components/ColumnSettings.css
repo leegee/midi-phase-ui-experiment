@@ -3,4 +3,5 @@
 .column-size-input {
     width: 2em;
     text-align: right;
+    margin-left: var(--midi-app-input-margin-left);
 }
