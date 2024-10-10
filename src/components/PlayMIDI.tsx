@@ -8,16 +8,16 @@ const NOTE_ON = 0x90;
 const NOTE_OFF = 0x80;
 
 const PlayPauseButton: React.FC = () => {
-    const { selectedOutput } = useMIDI();  // Get selected MIDI output
+    const { selectedOutput } = useMIDI();
+    const { bpm } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
-    const phrases = useStore((state) => state.phrases);  // Get the note phrases from store
+    const phrases = useStore((state) => state.phrases);
 
     const audioContextRef = useRef<AudioContext | null>(null);
-    const bpm = 120;  // Beats per minute
     const intervalDuration = (60 / bpm);  // Time per beat in seconds
 
     const scheduleNotes = useCallback((startTime: number) => {
-        const currentTime = window.performance.now(); // Use high-resolution time from `performance.now()`
+        const currentTime = window.performance.now();
 
         phrases.forEach((phrase) => {
             const notes = phrase.notes || [];
