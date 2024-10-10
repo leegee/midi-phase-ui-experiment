@@ -28,6 +28,17 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(false))
     );
 
+    // Sync gridNotes with the phrase's notes when the phrase changes
+    useEffect(() => {
+        if (phrase) {
+            const newGridNotes = Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(false));
+            phrase.notes.forEach(note => {
+                newGridNotes[note.pitch][note.startTime] = true; // Mark the note's position as active
+            });
+            setGridNotes(newGridNotes);
+        }
+    }, [phrase]);
+
     // Function to toggle note presence on the grid
     const toggleNote = (pitch: number, beat: number) => {
         const newGridNotes = [...gridNotes];
