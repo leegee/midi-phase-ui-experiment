@@ -6,11 +6,13 @@ import BPMInput from './components/BPMInput';
 import GridInput from './components/GridInput';
 import ColumnSettings from './components/ColumnSettings';
 import useMIDI from './hooks/useMIDI';
+import DeviceSelector from './components/DeviceSelector';
+
 
 const NUM_GRIDS = 2;
 
 const App: React.FC = () => {
-  const { midiAccess, error } = useMIDI();
+  const { error, selectedInput, selectedOutput } = useMIDI();
 
   return (
     <main>
@@ -18,17 +20,25 @@ const App: React.FC = () => {
 
       {error && <div className="error">{error}</div>}
 
-      <BPMInput />
+      {!selectedInput || !selectedOutput && <div>Select an input and output device to continue.</div>}
 
-      <div className="grid-components-container">
-        {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (
-          <section className="grid-input" key={gridIndex}>
-            <h3>Phrase {gridIndex + 1}</h3>
-            <ColumnSettings gridIndex={gridIndex} />
-            <GridInput gridIndex={gridIndex} />
-          </section>
-        ))}
-      </div>
+      {!error && (selectedInput && selectedOutput) && <>
+
+        <DeviceSelector />
+        <BPMInput />
+
+        <div className="grid-components-container">
+          {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (
+            <section className="grid-input" key={gridIndex}>
+              <h3>Phrase {gridIndex + 1}</h3>
+              <ColumnSettings gridIndex={gridIndex} />
+              <GridInput gridIndex={gridIndex} />
+            </section>
+          ))}
+        </div>
+
+      </>
+      }
 
     </main>
   );
