@@ -1,14 +1,14 @@
 /* src/components/GridInput.css */
 
 :root {
-    --cell-size: 10pt; /* Define cell size variable */
-    --grid-background: lightgray; /* Default background color */
-    --active-background: lightblue; /* Active cell color */
+    --cell-size: 10pt; 
+    --grid-background: lightgray; 
+    --active-background: lightblue;
 }
 
-.grid-container {
+.grid-component {
     display: grid;
-    gap: 1px; /* Optional: Add space between cells */
+    margin: 1em;
 }
 
 .grid-cell {

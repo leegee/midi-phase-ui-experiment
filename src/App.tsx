@@ -15,7 +15,7 @@ const App: React.FC = () => {
 
       <BPMInput />
 
-      <div className="grid-container">
+      <div className="grid-components-container">
         {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (
           <section className="grid-input" key={gridIndex}>
             <h3>Phrase {gridIndex + 1}</h3>
