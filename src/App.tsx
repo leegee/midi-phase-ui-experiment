@@ -7,6 +7,7 @@ import GridInput from './components/GridInput';
 import ColumnSettings from './components/ColumnSettings';
 import useMIDI from './hooks/useMIDI';
 import DeviceSelector from './components/DeviceSelector';
+import PlayPauseButton from './components/PlayMIDI';
 
 
 const NUM_GRIDS = 2;
@@ -26,6 +27,7 @@ const App: React.FC = () => {
 
         <DeviceSelector />
         <BPMInput />
+        <PlayPauseButton />
 
         <div className="grid-components-container">
           {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (

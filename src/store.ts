@@ -1,10 +1,10 @@
 // src/store.ts
 import { create } from 'zustand';
 
-// Define types
 export interface GridNote {
     pitch: number;
     startTime: number;
+    velocity: number;
 }
 
 export interface Phrase {

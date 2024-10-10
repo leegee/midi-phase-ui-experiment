@@ -40,13 +40,7 @@ const useMIDI = () => {
     }, []);
 
 
-    const sendMIDIMessage = (message: number[]) => {
-        if (selectedOutput) {
-            selectedOutput.send(message);
-        }
-    };
-
-    return { sendMIDIMessage, inputs, outputs, selectedInput, setSelectedInput, selectedOutput, setSelectedOutput, error };
+    return { inputs, outputs, selectedInput, setSelectedInput, selectedOutput, setSelectedOutput, error };
 };
 
 
