@@ -5,13 +5,18 @@ import './App.css';
 import BPMInput from './components/BPMInput';
 import GridInput from './components/GridInput';
 import ColumnSettings from './components/ColumnSettings';
+import useMIDI from './hooks/useMIDI';
 
 const NUM_GRIDS = 2;
 
 const App: React.FC = () => {
+  const { midiAccess, error } = useMIDI();
+
   return (
-    <main style={{ padding: '1em' }}>
+    <main>
       <h1>MIDI Phase  Editor</h1>
+
+      {error && <div className="error">{error}</div>}
 
       <BPMInput />
 

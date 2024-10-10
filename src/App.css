@@ -1,4 +1,9 @@
 /* src/App.css */
+
+main {
+  padding: 1em;
+}
+
 .grid-components-container {
   display: flex;
   flex-wrap: wrap;
