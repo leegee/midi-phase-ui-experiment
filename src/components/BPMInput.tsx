@@ -1,6 +1,8 @@
 // src/components/BPMInput.tsx
 import React, { useState } from 'react';
+
 import useMusicStore from '../store';
+import "./BPMInput.css";
 
 const BPMInput: React.FC = () => {
     const { bpm, setBPM } = useMusicStore();
@@ -23,10 +25,13 @@ const BPMInput: React.FC = () => {
             <label>
                 BPM:
                 <input
+                    className="bpm-input"
                     type="number"
                     value={inputValue}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    min={1}
+                    max={300}
                 />
             </label>
         </div>

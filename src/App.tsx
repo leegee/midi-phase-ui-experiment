@@ -1,28 +1,31 @@
 // src/App.tsx
 import React from 'react';
+
+import './App.css';
 import BPMInput from './components/BPMInput';
 import GridInput from './components/GridInput';
-import useMusicStore from './store';
-import './App.css'; // Import the CSS file
+import ColumnSettings from './components/ColumnSettings';
 
-const NUM_GRIDS = 2; // Adjust the number of grids as needed
+const NUM_GRIDS = 2;
 
 const App: React.FC = () => {
-  const { bpm } = useMusicStore();
-
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>MIDI Phrase Editor</h1>
+    <main style={{ padding: '1em' }}>
+      <h1>MIDI Phase  Editor</h1>
+
       <BPMInput />
+
       <div className="grid-container">
-        {Array.from({ length: NUM_GRIDS }).map((_, index) => (
-          <div className="grid-input" key={index}>
-            <GridInput gridIndex={index} />
-          </div>
+        {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (
+          <section className="grid-input" key={gridIndex}>
+            <h3>Phrase {gridIndex + 1}</h3>
+            <ColumnSettings gridIndex={gridIndex} />
+            <GridInput gridIndex={gridIndex} />
+          </section>
         ))}
       </div>
-      <p>Current BPM: {bpm}</p>
-    </div>
+
+    </main>
   );
 };
 

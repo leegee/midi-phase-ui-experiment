@@ -28,13 +28,12 @@ const useMusicStore = create<MusicState>((set) => ({
         { notes: [], numColumns: 3 },
         { notes: [], numColumns: 4 },
     ],
-    setNumColumns: (gridIndex: number, numColumns: number) =>
+    setNumColumns: (gridIndex, numColumns) =>
         set((state) => {
             const newPhrases = [...state.phrases];
-            newPhrases[gridIndex] = {
-                ...newPhrases[gridIndex],
-                numColumns,
-            };
+            if (newPhrases[gridIndex]) {
+                newPhrases[gridIndex].numColumns = numColumns;
+            }
             return { phrases: newPhrases };
         }),
     setPhrase: (gridIndex: number, phrase: Phrase) =>
