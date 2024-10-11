@@ -15,14 +15,16 @@ export interface Phrase {
 interface MusicState {
     bpm: number;
     setBPM: (newBPM: number) => void;
-    phrases: Phrase[];
-    setNumColumns: (gridIndex: number, numColumns: number) => void;
-    setPhrase: (gridIndex: number, phrase: Phrase) => void; // Specify that phrase is of type Phrase
 
-    setInputChannels: (channels: number[]) => void;
+    phrases: Phrase[];
+    setPhrase: (gridIndex: number, phrase: Phrase) => void; // Specify that phrase is of type Phrase
+    setNumColumns: (gridIndex: number, numColumns: number) => void;
+
     inputChannels: number[];
-    setOutputChannel: (channel: number) => void;
+    setInputChannels: (channels: number[]) => void;
+
     outputChannel: number;
+    setOutputChannel: (channel: number) => void;
 }
 
 // Create the store
