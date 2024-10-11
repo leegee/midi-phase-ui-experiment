@@ -28,11 +28,19 @@ const useMIDI = () => {
                     setInputs(inputDevices);
                     setOutputs(outputDevices);
 
-                    // Optionally, set default input/output devices here
-                } else {
+                    // Set Focusrite as default input/output if available
+                    const defaultInput = inputDevices.find(device => device.name && /focusrite/i.test(device.name)) || null;
+                    const defaultOutput = outputDevices.find(device => device.name && /focusrite/i.test(device.name)) || null;
+                    setSelectedInput(defaultInput);
+                    setSelectedOutput(defaultOutput);
+                }
+
+                else {
                     throw new Error('Web MIDI API is not supported in this browser.');
                 }
-            } catch (err) {
+            }
+
+            catch (err) {
                 console.error('Failed to get MIDI access', err);
                 setError('Failed to get MIDI access');
             }
