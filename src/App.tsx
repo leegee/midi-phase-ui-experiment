@@ -26,6 +26,7 @@ const App: React.FC = () => {
 
         <DeviceSelector />
         <BPMInput />
+
         <PlayPauseButton />
 
         <div className="grid-components-container">

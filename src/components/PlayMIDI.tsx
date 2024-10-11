@@ -18,10 +18,10 @@ const PlayPauseButton: React.FC = () => {
 
         grids.forEach((grid, gridIndex) => {
             const notes = grid.notes || [];
-            const currentBeat = grid.currentBeat; // Use the currentBeat from the grid
+            const currentBeat = grid.currentBeat;
             const noteToPlay = notes[currentBeat];
 
-            console.log('Grid', gridIndex, 'beat', currentBeat);
+            // console.log('Grid', gridIndex, 'beat', currentBeat);
 
             if (noteToPlay) {
                 const noteOnTime = window.performance.now();
