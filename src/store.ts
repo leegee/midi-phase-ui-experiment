@@ -21,6 +21,7 @@ interface MusicState {
     setGrid: (gridIndex: number, grid: Grid) => void; // Specify that grid is of type Grid
     setNumColumns: (gridIndex: number, numColumns: number) => void;
     updateGridBeat: (gridIndex: number) => void;
+    resetAllCurrentBeats: () => void;
 
     inputChannels: number[];
     setInputChannels: (channels: number[]) => void;
@@ -65,6 +66,15 @@ const useMusicStore = create<MusicState>((set) => ({
                 currentBeat: (grid.currentBeat + 1) % grid.numColumns,
             };
 
+            return { grids: updatedGrids };
+        });
+    },
+    resetAllCurrentBeats: () => {
+        set((state) => {
+            const updatedGrids = state.grids.map((grid) => ({
+                ...grid,
+                currentBeat: 0,
+            }));
             return { grids: updatedGrids };
         });
     },

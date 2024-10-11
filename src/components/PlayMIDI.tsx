@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useMIDI from '../hooks/useMIDI';
-import useStore, { type GridNote } from '../store';
+import useStore from '../store';
 
 const BASE_PITCH = 21;
 const NOTE_ON = 0x90;
@@ -36,6 +36,7 @@ const PlayPauseButton: React.FC = () => {
         });
     }, [grids, selectedOutput, outputChannel, intervalDuration]);
 
+    // If playing play
     useEffect(() => {
         if (isPlaying && selectedOutput) {
             if (!audioContextRef.current) {
@@ -49,6 +50,9 @@ const PlayPauseButton: React.FC = () => {
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
+        if (!isPlaying) {
+            useStore.getState().resetAllCurrentBeats();
+        }
     };
 
     return (
