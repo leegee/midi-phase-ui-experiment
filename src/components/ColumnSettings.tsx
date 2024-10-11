@@ -9,10 +9,10 @@ interface ColumnSettingsProps {
 }
 
 const ColumnSettings: React.FC<ColumnSettingsProps> = ({ gridIndex }) => {
-    const { phrases, setNumColumns } = useMusicStore();
-    const phrase = phrases[gridIndex];
+    const { grids, setNumColumns } = useMusicStore();
+    const grid = grids[gridIndex];
 
-    const [numColumns, setLocalNumColumns] = useState(phrase.numColumns);
+    const [numColumns, setLocalNumColumns] = useState(grid.numColumns);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value);

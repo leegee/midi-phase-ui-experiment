@@ -7,18 +7,20 @@ export interface GridNote {
     velocity: number;
 }
 
-export interface Phrase {
+export interface Grid {
     notes: GridNote[];
     numColumns: number;
+    currentBeat: number;
 }
 
 interface MusicState {
     bpm: number;
     setBPM: (newBPM: number) => void;
 
-    phrases: Phrase[];
-    setPhrase: (gridIndex: number, phrase: Phrase) => void; // Specify that phrase is of type Phrase
+    grids: Grid[];
+    setGrid: (gridIndex: number, grid: Grid) => void; // Specify that grid is of type Grid
     setNumColumns: (gridIndex: number, numColumns: number) => void;
+    updateGridBeat: (gridIndex: number) => void;
 
     inputChannels: number[];
     setInputChannels: (channels: number[]) => void;
@@ -34,23 +36,38 @@ const useMusicStore = create<MusicState>((set) => ({
 
     setNumColumns: (gridIndex, numColumns) =>
         set((state) => {
-            const newPhrases = [...state.phrases];
-            if (newPhrases[gridIndex]) {
-                newPhrases[gridIndex].numColumns = numColumns;
+            const newGrids = [...state.grids];
+            if (newGrids[gridIndex]) {
+                newGrids[gridIndex].numColumns = numColumns;
             }
-            return { phrases: newPhrases };
+            return { grids: newGrids };
         }),
 
-    phrases: [
-        { notes: [], numColumns: 3 },
-        { notes: [], numColumns: 4 },
+    grids: [
+        { notes: [], numColumns: 3, currentBeat: 0, },
+        { notes: [], numColumns: 4, currentBeat: 0, },
     ],
-    setPhrase: (gridIndex: number, phrase: Phrase) =>
+    setGrid: (gridIndex: number, grid: Grid) =>
         set((state) => {
-            const newPhrases = [...state.phrases];
-            newPhrases[gridIndex] = phrase;
-            return { phrases: newPhrases };
+            const newGrids = [...state.grids];
+            newGrids[gridIndex] = grid;
+            return { grids: newGrids };
         }),
+    updateGridBeat: (gridIndex) => {
+        set((state) => {
+            const grid = state.grids[gridIndex];
+
+            if (!grid) return state;
+
+            const updatedGrids = [...state.grids];
+            updatedGrids[gridIndex] = {
+                ...grid,
+                currentBeat: (grid.currentBeat + 1) % grid.numColumns,
+            };
+
+            return { grids: updatedGrids };
+        });
+    },
 
     inputChannels: [1],
     setInputChannels: (channels) => set({ inputChannels: channels }),

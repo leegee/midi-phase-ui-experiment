@@ -1,44 +1,40 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-
 import useMIDI from '../hooks/useMIDI';
 import useStore, { type GridNote } from '../store';
 
-const BASE_PITCH = 21; // All stored notes are grid row numbers: add BASE_PITCH to get a MIDI pitch.
+const BASE_PITCH = 21;
 const NOTE_ON = 0x90;
 const NOTE_OFF = 0x80;
 
 const PlayPauseButton: React.FC = () => {
     const { selectedOutput } = useMIDI();
-    const { bpm, outputChannel } = useStore();
+    const { bpm, outputChannel, grids } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
-    const phrases = useStore((state) => state.phrases);
-
     const audioContextRef = useRef<AudioContext | null>(null);
-    const intervalDuration = (60 / bpm);
+    const intervalDuration = (60 / bpm) * 1000; // Convert to milliseconds
 
-    const scheduleNotes = useCallback((startTime: number) => {
-        const currentTime = window.performance.now();
+    const scheduleNotes = useCallback(() => {
+        if (!selectedOutput) return;
 
-        phrases.forEach((phrase) => {
-            const notes = phrase.notes || [];
+        grids.forEach((grid, gridIndex) => {
+            const notes = grid.notes || [];
+            const currentBeat = grid.currentBeat; // Use the currentBeat from the grid
+            const noteToPlay = notes[currentBeat];
 
-            notes.forEach((note: GridNote) => {
-                // Calculate the exact timestamp for the note-on and note-off events
-                const noteOnTime = startTime + (note.startTime * intervalDuration * 1000);
-                const noteOffTime = noteOnTime + (intervalDuration * 1000);  // Define note duration
+            console.log('Grid', gridIndex, 'beat', currentBeat);
 
-                // Schedule the note-on event using `output.send()`
-                if (selectedOutput) {
+            if (noteToPlay) {
+                const noteOnTime = window.performance.now();
+                const noteOffTime = noteOnTime + intervalDuration;
 
-                    // selectedOutput.send([NOTE_ON, BASE_PITCH + note.pitch, note.velocity || 100], currentTime + noteOnTime);
-                    selectedOutput.send([NOTE_ON + outputChannel, 100, 100]);
+                selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + noteToPlay.pitch, noteToPlay.velocity || 100], noteOnTime);
+                selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + noteToPlay.pitch, 0], noteOffTime);
+            }
 
-                    // Schedule the note-off event
-                    selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + note.pitch, 0], currentTime + noteOffTime);
-                }
-            });
+            // Update the current beat for this grid using the store method
+            useStore.getState().updateGridBeat(gridIndex);
         });
-    }, [phrases, selectedOutput, outputChannel, intervalDuration]);
+    }, [grids, selectedOutput, outputChannel, intervalDuration]);
 
     useEffect(() => {
         if (isPlaying && selectedOutput) {
@@ -46,17 +42,10 @@ const PlayPauseButton: React.FC = () => {
                 audioContextRef.current = new window.AudioContext();
             }
 
-            const startTime = audioContextRef.current.currentTime;
-            scheduleNotes(startTime);
+            const interval = setInterval(scheduleNotes, intervalDuration);
+            return () => clearInterval(interval);
         }
-
-        return () => {
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
-                audioContextRef.current = null;
-            }
-        };
-    }, [isPlaying, selectedOutput, scheduleNotes]);
+    }, [isPlaying, selectedOutput, scheduleNotes, intervalDuration]);
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);

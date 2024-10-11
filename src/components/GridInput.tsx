@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 
 import './GridInput.css';
-import useMusicStore, { GridNote, Phrase } from '../store'; // Ensure Phrase is imported
+import useMusicStore, { GridNote, Grid } from '../store'; // Ensure Grid is imported
 
 const GRID_HEIGHT = 88;
 
@@ -11,32 +11,32 @@ interface GridInputProps {
 }
 
 const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
-    const { phrases, setPhrase } = useMusicStore();
-    const phrase: Phrase | undefined = phrases[gridIndex];
+    const { grids, setGrid } = useMusicStore();
+    const grid: Grid | undefined = grids[gridIndex];
 
     // useEffect(() => {
-    //     if (phrase) {
-    //         console.log(`Phrase ${gridIndex + 1} notes:`, phrase.notes);
+    //     if (grid) {
+    //         console.log(`Grid ${gridIndex + 1} notes:`, grid.notes);
     //     } else {
-    //         console.warn(`Phrase ${gridIndex + 1} is undefined.`);
+    //         console.warn(`Grid ${gridIndex + 1} is undefined.`);
     //     }
-    // }, [phrase, gridIndex]);
+    // }, [grid, gridIndex]);
 
     // Local state to manage notes on the grid
     const [gridNotes, setGridNotes] = useState<boolean[][]>(
-        Array(GRID_HEIGHT).fill(null).map(() => Array(phrase ? phrase.numColumns : 0).fill(false))
+        Array(GRID_HEIGHT).fill(null).map(() => Array(grid ? grid.numColumns : 0).fill(false))
     );
 
-    // Sync gridNotes with the phrase's notes when the phrase changes
+    // Sync gridNotes with the grid's notes when the grid changes
     useEffect(() => {
-        if (phrase) {
-            const newGridNotes = Array(GRID_HEIGHT).fill(null).map(() => Array(phrase.numColumns).fill(false));
-            phrase.notes.forEach(note => {
+        if (grid) {
+            const newGridNotes = Array(GRID_HEIGHT).fill(null).map(() => Array(grid.numColumns).fill(false));
+            grid.notes.forEach(note => {
                 newGridNotes[note.pitch][note.startTime] = true;
             });
             setGridNotes(newGridNotes);
         }
-    }, [phrase]);
+    }, [grid]);
 
     // Function to toggle note presence on the grid
     const toggleNote = (pitch: number, beat: number) => {
@@ -44,33 +44,36 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         newGridNotes[pitch][beat] = !newGridNotes[pitch][beat];
         setGridNotes(newGridNotes);
 
-        // Update the phrase in the store if phrase exists
-        if (phrase) {
+        // Update the grid in the store if grid exists
+        if (grid) {
             const newNotes: GridNote[] = newGridNotes.flatMap((row, pitchIndex) =>
                 row.map((isActive, beatIndex) => (isActive ? { pitch: pitchIndex, startTime: beatIndex } : null)).filter(Boolean) as GridNote[]
             );
 
-            const updatedPhrase: Phrase = {
+            const updatedGrid: Grid = {
                 notes: newNotes,
-                numColumns: phrase.numColumns,
+                numColumns: grid.numColumns,
+                currentBeat: 0,
             };
 
-            setPhrase(gridIndex, updatedPhrase);
+            setGrid(gridIndex, updatedGrid);
         }
     };
+
+    const currentBeat = grid?.currentBeat ?? 0;
 
     return (
         <section
             className="grid-component padded-container"
-            style={{ gridTemplateColumns: `repeat(${phrase ? phrase.numColumns : 0}, var(--cell-size))` }}
+            style={{ gridTemplateColumns: `repeat(${grid ? grid.numColumns : 0}, var(--cell-size))` }}
         >
             {Array.from({ length: GRID_HEIGHT }).map((_, pitch) => (
                 // Directly mapping the pitches to grid cells
-                Array.from({ length: phrase ? phrase.numColumns : 0 }).map((_, beat) => (
+                Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
                     <div
                         key={`${pitch}-${beat}`}
                         onClick={() => toggleNote(pitch, beat)}
-                        className={`grid-cell ${gridNotes[pitch][beat] ? 'active' : ''}`}
+                        className={`grid-cell ${gridNotes[pitch][beat] ? 'active' : ''} ${beat === currentBeat ? 'highlight' : ''}`}
                     />
                 ))
             ))}

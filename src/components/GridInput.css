@@ -3,7 +3,9 @@
 :root {
     --cell-size: 10pt; 
     --grid-background: lightgray; 
-    --active-background: lightblue;
+    --selected-background: lightblue;
+    --current-beat-background: lightgreen;
+    --current-beat-selected-background: blue;
 }
 
 .grid-component {
@@ -23,8 +25,13 @@
 }
 
 .grid-cell.active {
-    background-color: var(--active-background);
+    background-color: var(--selected-background);
 }
 
+.grid-cell.highlight {
+    background-color: var(--current-beat-background); 
+}
 
-
+.grid-cell.active.highlight {
+    background-color:var(--current-beat-selected-background);
+}
