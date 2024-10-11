@@ -43,7 +43,6 @@ const PlayPauseButton: React.FC = () => {
             }
 
             const interval = setInterval(scheduleNotes, intervalDuration);
-
             return () => {
                 if (interval) {
                     clearInterval(interval);
