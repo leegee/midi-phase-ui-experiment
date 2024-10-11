@@ -1,7 +1,7 @@
 /* src/components/GridInput.css */
 
 :root {
-    --cell-size: 10pt; 
+    --cell-size: 20pt; 
     --grid-background: lightgray; 
     --selected-background: lightblue;
     --current-beat-background: lightgreen;
@@ -12,8 +12,8 @@
     display: grid;
     margin: 1em;
     overflow-y: auto;
-    height: 10em;
     border: var(--midi-app-container-border);
+    height: calc(var(--cell-size) * 12 );
 }
 
 .grid-cell {

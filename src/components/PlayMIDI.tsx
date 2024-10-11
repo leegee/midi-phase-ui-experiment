@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import useStore from '../store';
 
 const BASE_PITCH = 21;
@@ -43,7 +43,12 @@ const PlayPauseButton: React.FC = () => {
             }
 
             const interval = setInterval(scheduleNotes, intervalDuration);
-            return () => clearInterval(interval);
+
+            return () => {
+                if (interval) {
+                    clearInterval(interval);
+                }
+            };
         }
     }, [isPlaying, selectedOutput, scheduleNotes, intervalDuration]);
 
