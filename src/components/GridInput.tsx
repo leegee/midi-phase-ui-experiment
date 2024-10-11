@@ -14,14 +14,13 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     const { phrases, setPhrase } = useMusicStore();
     const phrase: Phrase | undefined = phrases[gridIndex];
 
-    // Log the phrase notes for debugging, only if the phrase exists
-    useEffect(() => {
-        if (phrase) {
-            console.log(`Phrase ${gridIndex + 1} notes:`, phrase.notes);
-        } else {
-            console.warn(`Phrase ${gridIndex + 1} is undefined.`);
-        }
-    }, [phrase, gridIndex]);
+    // useEffect(() => {
+    //     if (phrase) {
+    //         console.log(`Phrase ${gridIndex + 1} notes:`, phrase.notes);
+    //     } else {
+    //         console.warn(`Phrase ${gridIndex + 1} is undefined.`);
+    //     }
+    // }, [phrase, gridIndex]);
 
     // Local state to manage notes on the grid
     const [gridNotes, setGridNotes] = useState<boolean[][]>(
