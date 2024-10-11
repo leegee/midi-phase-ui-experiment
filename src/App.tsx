@@ -24,10 +24,11 @@ const App: React.FC = () => {
 
       {!error && selectedInput && selectedOutput && <>
 
-        <DeviceSelector />
-        <BPMInput />
-
-        <PlayPauseButton />
+        <section className='app-toolbar'>
+          <BPMInput />
+          <PlayPauseButton />
+          <DeviceSelector />
+        </section>
 
         <div className="grid-components-container">
           {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (

@@ -25,7 +25,7 @@ const DeviceSelector: React.FC = () => {
 
     return (
         <div>
-            <button onClick={() => setIsModalOpen(true)}>Select MIDI Devices</button>
+            <button onClick={() => setIsModalOpen(true)}>Device Set-up</button>
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title='Select MIDI Devices'>
                 <section className='device-selector-component'>

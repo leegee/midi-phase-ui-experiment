@@ -8,6 +8,7 @@ body {
 
   --midi-app-input-margin-left: 0.6em;
   --midi-app-container-padding: 0.6em;
+  --midi-app-container-border: 1pt solid grey;
 }
 
 code {

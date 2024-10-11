@@ -5,7 +5,7 @@
     --grid-background: lightgray; 
     --selected-background: lightblue;
     --current-beat-background: lightgreen;
-    --current-beat-selected-background: blue;
+    --current-beat-selected-background: green;
 }
 
 .grid-component {
@@ -13,6 +13,7 @@
     margin: 1em;
     overflow-y: auto;
     height: 10em;
+    border: var(--midi-app-container-border);
 }
 
 .grid-cell {
