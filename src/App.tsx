@@ -20,7 +20,16 @@ const App: React.FC = () => {
 
       {error && <div className="error">{error}</div>}
 
-      {(!selectedInput || !selectedOutput) && <div>Select an input and output device to continue.</div>}
+      {(!selectedInput || !selectedOutput) &&
+        <section>
+          <p>
+            Select an input and output device to continue.
+          </p>
+          <div>
+            <DeviceSelector />
+          </div>
+        </section>
+      }
 
       {!error && selectedInput && selectedOutput && <>
 

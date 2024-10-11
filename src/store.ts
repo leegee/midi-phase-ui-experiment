@@ -28,10 +28,32 @@ interface MusicState {
 
     outputChannel: number;
     setOutputChannel: (channel: number) => void;
+
+    selectedInput: WebMidi.MIDIInput | null;
+    setSelectedInput: (input: WebMidi.MIDIInput | null) => void;
+    selectedOutput: WebMidi.MIDIOutput | null;
+    setSelectedOutput: (output: WebMidi.MIDIOutput | null) => void;
+    inputs: WebMidi.MIDIInput[];
+    setInputs: (inputs: WebMidi.MIDIInput[]) => void;
+    outputs: WebMidi.MIDIOutput[];
+    setOutputs: (outputs: WebMidi.MIDIOutput[]) => void;
+    error: string | null;
+    setError: (error: string | null) => void;
 }
 
 // Create the store
 const useMusicStore = create<MusicState>((set) => ({
+    selectedInput: null,
+    setSelectedInput: (input) => set({ selectedInput: input }),
+    selectedOutput: null,
+    setSelectedOutput: (output) => set({ selectedOutput: output }),
+    inputs: [],
+    setInputs: (inputs) => set({ inputs }),
+    outputs: [],
+    setOutputs: (outputs) => set({ outputs }),
+    error: null,
+    setError: (error) => set({ error }),
+
     bpm: 120,
     setBPM: (newBPM: number) => set({ bpm: newBPM }), // Type for newBPM
 

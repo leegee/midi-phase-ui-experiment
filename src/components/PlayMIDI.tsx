@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import useMIDI from '../hooks/useMIDI';
 import useStore from '../store';
 
 const BASE_PITCH = 21;
@@ -7,8 +6,7 @@ const NOTE_ON = 0x90;
 const NOTE_OFF = 0x80;
 
 const PlayPauseButton: React.FC = () => {
-    const { selectedOutput } = useMIDI();
-    const { bpm, outputChannel, grids } = useStore();
+    const { bpm, outputChannel, grids, selectedOutput } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
     const audioContextRef = useRef<AudioContext | null>(null);
     const intervalDuration = (60 / bpm) * 1000; // Convert to milliseconds
@@ -21,11 +19,12 @@ const PlayPauseButton: React.FC = () => {
             const currentBeat = grid.currentBeat;
             const noteToPlay = notes[currentBeat];
 
-            // console.log('Grid', gridIndex, 'beat', currentBeat);
 
             if (noteToPlay) {
                 const noteOnTime = window.performance.now();
                 const noteOffTime = noteOnTime + intervalDuration;
+
+                console.log(selectedOutput, 'Grid', gridIndex, 'beat', currentBeat, 'note', NOTE_ON + outputChannel, 'pitch', noteToPlay.pitch);
 
                 selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + noteToPlay.pitch, noteToPlay.velocity || 100], noteOnTime);
                 selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + noteToPlay.pitch, 0], noteOffTime);

@@ -1,13 +1,20 @@
 // src/hooks/useMIDI.ts
-
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import useMusicStore from '../store';
 
 const useMIDI = () => {
-    const [inputs, setInputs] = useState<WebMidi.MIDIInput[]>([]);
-    const [outputs, setOutputs] = useState<WebMidi.MIDIOutput[]>([]);
-    const [selectedInput, setSelectedInput] = useState<WebMidi.MIDIInput | null>(null);
-    const [selectedOutput, setSelectedOutput] = useState<WebMidi.MIDIOutput | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const {
+        inputs,
+        setInputs,
+        outputs,
+        setOutputs,
+        selectedInput,
+        setSelectedInput,
+        selectedOutput,
+        setSelectedOutput,
+        error,
+        setError,
+    } = useMusicStore();
 
     useEffect(() => {
         const getMIDI = async () => {
@@ -21,12 +28,7 @@ const useMIDI = () => {
                     setInputs(inputDevices);
                     setOutputs(outputDevices);
 
-                    // Default to the first matching input and output devices
-                    const defaultInput = inputDevices.find(device => device.name && /focusrite/i.test(device.name)) || null;
-                    const defaultOutput = outputDevices.find(device => device.name && /focusrite/i.test(device.name)) || null;
-
-                    setSelectedInput(defaultInput);
-                    setSelectedOutput(defaultOutput);
+                    // Optionally, set default input/output devices here
                 } else {
                     throw new Error('Web MIDI API is not supported in this browser.');
                 }
@@ -37,11 +39,17 @@ const useMIDI = () => {
         };
 
         getMIDI();
-    }, []);
+    }, [setInputs, setOutputs, setError]);
 
-
-    return { inputs, outputs, selectedInput, setSelectedInput, selectedOutput, setSelectedOutput, error };
+    return {
+        inputs,
+        outputs,
+        selectedInput,
+        setSelectedInput,
+        selectedOutput,
+        setSelectedOutput,
+        error,
+    };
 };
-
 
 export default useMIDI;

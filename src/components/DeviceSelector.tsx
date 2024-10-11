@@ -1,27 +1,27 @@
 // src/components/DeviceSelector.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './DeviceSelector.css';
-import useMIDI from '../hooks/useMIDI';
-import store from '../store';
+import useStore from '../store';
 import InputChannelSelector from './InputChannelSelector';
 import OutputChannelSelector from './OutputChannelSelector';
 import Modal from './Modal';
 
 const DeviceSelector: React.FC = () => {
-    const { inputs, outputs, selectedInput, setSelectedInput, selectedOutput, setSelectedOutput } = useMIDI();
-    const { inputChannels, setInputChannels, outputChannel, setOutputChannel } = store();
-    const [localInputChannels, setLocalInputChannels] = useState<number[]>(inputChannels);
-    const [localOutputChannel, setLocalOutputChannel] = useState<number>(outputChannel);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        setInputChannels(localInputChannels);
-    }, [localInputChannels, setInputChannels]);
-
-    useEffect(() => {
-        setOutputChannel(localOutputChannel);
-    }, [localOutputChannel, setOutputChannel]);
+    const {
+        inputs,
+        outputs,
+        selectedInput,
+        setSelectedInput,
+        selectedOutput,
+        setSelectedOutput,
+        inputChannels,
+        setInputChannels,
+        outputChannel,
+        setOutputChannel,
+    } = useStore();
 
     return (
         <div>
@@ -29,6 +29,7 @@ const DeviceSelector: React.FC = () => {
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title='Select MIDI Devices'>
                 <section className='device-selector-component'>
+                    {/* Input Section */}
                     <div>
                         <label>
                             <select
@@ -47,12 +48,14 @@ const DeviceSelector: React.FC = () => {
                             </select>
                         </label>
 
+                        {/* Input Channel Selector */}
                         <InputChannelSelector
-                            selectedChannels={localInputChannels}
-                            onChange={(channels) => setLocalInputChannels(channels)}
+                            selectedChannels={inputChannels}
+                            onChange={setInputChannels}
                         />
                     </div>
 
+                    {/* Output Section */}
                     <div>
                         <label>
                             <select
@@ -71,9 +74,10 @@ const DeviceSelector: React.FC = () => {
                             </select>
                         </label>
 
+                        {/* Output Channel Selector */}
                         <OutputChannelSelector
-                            selectedChannel={localOutputChannel}
-                            onChange={(channel) => setLocalOutputChannel(channel)}
+                            selectedChannel={outputChannel}
+                            onChange={setOutputChannel}
                         />
                     </div>
                 </section>
