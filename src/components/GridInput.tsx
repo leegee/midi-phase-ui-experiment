@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import './GridInput.css';
 import useMusicStore, { GridNote, Phrase } from '../store'; // Ensure Phrase is imported
 
-const GRID_HEIGHT = 10; // Number of rows for MIDI pitches
+const GRID_HEIGHT = 88;
 
 interface GridInputProps {
     gridIndex: number;

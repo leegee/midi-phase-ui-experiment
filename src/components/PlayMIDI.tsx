@@ -3,12 +3,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useMIDI from '../hooks/useMIDI';
 import useStore, { type GridNote } from '../store';
 
+const BASE_PITCH = 21; // All stored notes are grid row numbers: add BASE_PITCH to get a MIDI pitch.
 const NOTE_ON = 0x90;
 const NOTE_OFF = 0x80;
 
 const PlayPauseButton: React.FC = () => {
     const { selectedOutput } = useMIDI();
-    const { bpm } = useStore();
+    const { bpm, outputChannel } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
     const phrases = useStore((state) => state.phrases);
 
@@ -28,14 +29,16 @@ const PlayPauseButton: React.FC = () => {
 
                 // Schedule the note-on event using `output.send()`
                 if (selectedOutput) {
-                    selectedOutput.send([NOTE_ON, note.pitch, note.velocity || 127], currentTime + noteOnTime);
+
+                    // selectedOutput.send([NOTE_ON, BASE_PITCH + note.pitch, note.velocity || 100], currentTime + noteOnTime);
+                    selectedOutput.send([NOTE_ON + outputChannel, 100, 100]);
 
                     // Schedule the note-off event
-                    selectedOutput.send([NOTE_OFF, note.pitch, 0], currentTime + noteOffTime);
+                    selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + note.pitch, 0], currentTime + noteOffTime);
                 }
             });
         });
-    }, [phrases, selectedOutput, intervalDuration]);
+    }, [phrases, selectedOutput, outputChannel, intervalDuration]);
 
     useEffect(() => {
         if (isPlaying && selectedOutput) {
@@ -44,7 +47,6 @@ const PlayPauseButton: React.FC = () => {
             }
 
             const startTime = audioContextRef.current.currentTime;
-
             scheduleNotes(startTime);
         }
 

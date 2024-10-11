@@ -9,6 +9,8 @@
 .grid-component {
     display: grid;
     margin: 1em;
+    overflow-y: auto;
+    height: 10em;
 }
 
 .grid-cell {
@@ -23,3 +25,6 @@
 .grid-cell.active {
     background-color: var(--active-background);
 }
+
+
+

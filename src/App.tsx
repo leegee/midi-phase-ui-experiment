@@ -9,7 +9,6 @@ import useMIDI from './hooks/useMIDI';
 import DeviceSelector from './components/DeviceSelector';
 import PlayPauseButton from './components/PlayMIDI';
 
-
 const NUM_GRIDS = 2;
 
 const App: React.FC = () => {
