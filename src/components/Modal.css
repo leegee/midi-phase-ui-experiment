@@ -1,0 +1,22 @@
+/* src/components/Modal.css */
+
+.modal-dialog {
+    padding: 1em;
+    width: minmax(20em, 50vw); 
+    position: relative; 
+}
+
+.modal-close {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+h2 {
+    font-size: 1em;
+    padding: 0;
+    margin: 0;
+}

@@ -3,3 +3,10 @@
 .device-selector-component {
     display: flex;
 }
+
+.device-selector-component label:first-of-type {
+    margin-right: 1em;
+}
+.device-selector-component select {
+    margin-top: 1em;
+}
