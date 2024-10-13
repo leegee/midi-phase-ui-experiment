@@ -8,8 +8,9 @@ const NOTE_OFF = 0x80;
 const PlayPauseButton: React.FC = () => {
     const { bpm, outputChannel, grids, selectedOutput } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
-    const [currentBeat, setCurrentBeat] = useState<number>(0);
+    const currentBeat = useRef<number>(0);
     const audioContextRef = useRef<AudioContext | null>(null);
+    const intervalRef = useRef<number | null>(null);  // New: intervalRef to store active interval
     const intervalDuration = (60 / bpm) * 1000; // Convert to milliseconds
 
     const scheduleNotes = useCallback(() => {
@@ -17,47 +18,55 @@ const PlayPauseButton: React.FC = () => {
 
         grids.forEach((grid, gridIndex) => {
             const notes = grid.notes || [];
-            const noteToPlay = notes[currentBeat];
+            const noteToPlay = notes[currentBeat.current];
 
             if (noteToPlay) {
                 const noteOnTime = window.performance.now();
                 const noteOffTime = noteOnTime + intervalDuration;
 
-                console.log(selectedOutput, 'Grid', gridIndex, 'beat', currentBeat, 'note', NOTE_ON + outputChannel, 'pitch', noteToPlay.pitch);
-
                 selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + noteToPlay.pitch, noteToPlay.velocity || 100], noteOnTime);
                 selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + noteToPlay.pitch, 0], noteOffTime);
             }
-
-            window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', {
-                detail: currentBeat
-            }));
-
-            setCurrentBeat(currentBeat + 1);
-            console.log('tick', currentBeat);
         });
-    }, [grids, selectedOutput, outputChannel, intervalDuration, currentBeat]);
+
+        window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', { detail: currentBeat.current }));
+        currentBeat.current = currentBeat.current + 1;
+        console.log('tick', currentBeat);
+    }, [grids, selectedOutput, outputChannel, currentBeat, intervalDuration]);
+
+    const startPlayback = useCallback(() => {
+        if (!audioContextRef.current) {
+            audioContextRef.current = new window.AudioContext();
+        }
+
+        if (!intervalRef.current) {
+            console.log('Starting interval');
+            intervalRef.current = window.setInterval(scheduleNotes, intervalDuration);  // Store the interval
+        }
+    }, [scheduleNotes, intervalDuration]);
+
+    const stopPlayback = useCallback(() => {
+        if (intervalRef.current) {
+            console.log('Stopping interval');
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;  // Clear the interval reference
+        }
+    }, []);
 
     useEffect(() => {
-        if (isPlaying && selectedOutput) {
-            if (!audioContextRef.current) {
-                audioContextRef.current = new window.AudioContext();
-            }
-
-            const interval = setInterval(scheduleNotes, intervalDuration);
-            return () => {
-                if (interval) {
-                    clearInterval(interval);
-                }
-            };
+        if (isPlaying) {
+            startPlayback();
+        } else {
+            stopPlayback();
         }
-    }, [isPlaying, selectedOutput, scheduleNotes, intervalDuration]);
+
+        return stopPlayback;
+    }, [isPlaying, startPlayback, stopPlayback]);
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
-        // On stop, start from the beginning.
         if (!isPlaying) {
-            setCurrentBeat(0);
+            currentBeat.current = 0;
         }
     };
 
