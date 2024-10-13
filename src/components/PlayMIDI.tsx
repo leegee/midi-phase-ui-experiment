@@ -31,7 +31,7 @@ const PlayPauseButton: React.FC = () => {
 
         window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', { detail: currentBeat.current }));
         currentBeat.current = currentBeat.current + 1;
-        console.log('tick', currentBeat);
+        console.debug('tick', currentBeat);
     }, [grids, selectedOutput, outputChannel, currentBeat, intervalDuration]);
 
     const startPlayback = useCallback(() => {
@@ -40,16 +40,17 @@ const PlayPauseButton: React.FC = () => {
         }
 
         if (!intervalRef.current) {
-            console.log('Starting interval');
-            intervalRef.current = window.setInterval(scheduleNotes, intervalDuration);  // Store the interval
+            console.debug('Starting interval');
+            scheduleNotes();
+            intervalRef.current = window.setInterval(scheduleNotes, intervalDuration);
         }
     }, [scheduleNotes, intervalDuration]);
 
     const stopPlayback = useCallback(() => {
         if (intervalRef.current) {
-            console.log('Stopping interval');
+            console.debug('Stopping interval');
             clearInterval(intervalRef.current);
-            intervalRef.current = null;  // Clear the interval reference
+            intervalRef.current = null;
         }
     }, []);
 
