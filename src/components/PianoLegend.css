@@ -1,6 +1,3 @@
-.piano-legend {
-    padding-top: var(--grid-header-height);
-}
 
 .key {
     display: flex;
