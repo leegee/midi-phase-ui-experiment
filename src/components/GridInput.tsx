@@ -78,15 +78,17 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             className="grid-component padded-container"
             style={{ gridTemplateColumns: `repeat(${grid ? grid.numColumns : 0}, var(--cell-size))` }}
         >
-            {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => (
-                Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
-                    <div
-                        key={`${pitch}-${beat}`}
-                        ref={el => (cellRefs.current[pitch][beat] = el)}
-                        onClick={() => toggleNote(pitch, beat)}
-                        className={`grid-cell ${gridNotesRef.current[pitch][beat] ? 'active' : ''}`}
-                    />
-                ))
+            {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
+                <div key={`column-${beat}`} className="grid-column">
+                    {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => (
+                        <div
+                            key={`${pitch}-${beat}`}
+                            ref={el => (cellRefs.current[pitch][beat] = el)}
+                            onClick={() => toggleNote(pitch, beat)}
+                            className={`grid-cell ${gridNotesRef.current[pitch][beat] ? 'active' : ''}`}
+                        />
+                    ))}
+                </div>
             ))}
         </section>
     );

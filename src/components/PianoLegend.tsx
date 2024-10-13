@@ -1,3 +1,5 @@
+import './PianoLegend.css';
+
 const PianoLegend: React.FC = () => {
     const getPianoNotes = () => {
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];

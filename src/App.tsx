@@ -3,14 +3,10 @@ import React from 'react';
 
 import './App.css';
 import BPMInput from './components/BPMInput';
-import GridInput from './components/GridInput';
-import ColumnSettings from './components/ColumnSettings';
 import useMIDI from './hooks/useMIDI';
 import DeviceSelector from './components/DeviceSelector';
 import PlayPauseButton from './components/PlayMIDI';
-import PianoLegend from './components/PianoLegend';
-
-const NUM_GRIDS = 2;
+import Grids from './components/Grids';
 
 const App: React.FC = () => {
   const { error, selectedInput, selectedOutput } = useMIDI();
@@ -40,16 +36,7 @@ const App: React.FC = () => {
           <DeviceSelector />
         </section>
 
-        <PianoLegend />
-
-        <div className="grid-components-container">
-          {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (
-            <section className="grid-wrapper" key={gridIndex}>
-              <ColumnSettings gridIndex={gridIndex} />
-              <GridInput gridIndex={gridIndex} />
-            </section>
-          ))}
-        </div>
+        <Grids />
 
       </>
       }

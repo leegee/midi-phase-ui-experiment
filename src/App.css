@@ -11,14 +11,3 @@ main {
   border: var(--midi-app-container-border);
 }
 
-.grid-components-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1em
-}
-
-.grid-wrapper {
-  display: flex;
-  flex-direction: column; 
-  border: 1pt solid grey;
-}

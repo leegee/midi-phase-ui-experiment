@@ -1,0 +1,20 @@
+/* components/Grids.css */
+
+.grids-component {
+  display: flex;
+  gap: 1em;
+  height: calc( var(--midi-grid-cell-size) * 12);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.grid-wrapper {
+  display: flex;
+  flex-direction: column; 
+  border: 1pt solid grey;
+}
+
+.column {
+    display: block;
+    float: left;
+}
