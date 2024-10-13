@@ -8,7 +8,6 @@
     background: white;
     color: black;
     border: 1px solid black;
-    box-sizing: border-box;
     width: var(--midi-grid-cell-size); 
     height: var(--midi-grid-cell-size);
     font-size: calc(var(--midi-grid-cell-size) * 0.5);

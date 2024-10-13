@@ -8,7 +8,7 @@
   margin-top: var(--midi-app-container-padding);
   display: flex;
   gap: var(--midi-app-container-padding);
-  height: calc( var(--midi-grid-cell-size) * 12);
+  height: calc( var(--midi-grid-cell-size) * 13);
   overflow-x: hidden;
   overflow-y: auto;
 }
