@@ -8,6 +8,7 @@ const NOTE_OFF = 0x80;
 const PlayPauseButton: React.FC = () => {
     const { bpm, outputChannel, grids, selectedOutput } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
+    const [currentBeat, setCurrentBeat] = useState<number>(0);
     const audioContextRef = useRef<AudioContext | null>(null);
     const intervalDuration = (60 / bpm) * 1000; // Convert to milliseconds
 
@@ -16,9 +17,7 @@ const PlayPauseButton: React.FC = () => {
 
         grids.forEach((grid, gridIndex) => {
             const notes = grid.notes || [];
-            const currentBeat = grid.currentBeat;
             const noteToPlay = notes[currentBeat];
-
 
             if (noteToPlay) {
                 const noteOnTime = window.performance.now();
@@ -30,12 +29,15 @@ const PlayPauseButton: React.FC = () => {
                 selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + noteToPlay.pitch, 0], noteOffTime);
             }
 
-            // Update the current beat for this grid using the store method
-            useStore.getState().updateGridBeat(gridIndex);
-        });
-    }, [grids, selectedOutput, outputChannel, intervalDuration]);
+            window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', {
+                detail: currentBeat
+            }));
 
-    // If playing play
+            setCurrentBeat(currentBeat + 1);
+            console.log('tick', currentBeat);
+        });
+    }, [grids, selectedOutput, outputChannel, intervalDuration, currentBeat]);
+
     useEffect(() => {
         if (isPlaying && selectedOutput) {
             if (!audioContextRef.current) {
@@ -53,8 +55,9 @@ const PlayPauseButton: React.FC = () => {
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
+        // On stop, start from the beginning.
         if (!isPlaying) {
-            useStore.getState().resetAllCurrentBeats();
+            setCurrentBeat(0);
         }
     };
 

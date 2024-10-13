@@ -1,8 +1,6 @@
-// src/components/GridInput.tsx
-import React, { useState, useEffect } from 'react';
-
+import React, { useEffect, useRef } from 'react';
 import './GridInput.css';
-import useMusicStore, { GridNote, Grid } from '../store'; // Ensure Grid is imported
+import useMusicStore, { GridNote, Grid } from '../store';
 
 const GRID_PITCH_RANGE = 88;
 
@@ -14,10 +12,8 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     const { grids, setGrid } = useMusicStore();
     const grid: Grid | undefined = grids[gridIndex];
 
-    // Local state to manage notes on the grid
-    const [gridNotes, setGridNotes] = useState<boolean[][]>(
-        Array(GRID_PITCH_RANGE).fill(null).map(() => Array(grid ? grid.numColumns : 0).fill(false))
-    );
+    const gridNotesRef = useRef<boolean[][]>(Array(GRID_PITCH_RANGE).fill(null).map(() => Array(grid ? grid.numColumns : 0).fill(false)));
+    const cellRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: GRID_PITCH_RANGE }, () => Array(grid ? grid.numColumns : 0).fill(null)));
 
     // Sync gridNotes with the grid's notes when the grid changes
     useEffect(() => {
@@ -26,17 +22,15 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             grid.notes.forEach(note => {
                 newGridNotes[note.pitch][note.startTime] = true;
             });
-            setGridNotes(newGridNotes);
+            gridNotesRef.current = newGridNotes;
         }
     }, [grid]);
 
     // Function to toggle note presence on the grid
     const toggleNote = (pitch: number, beat: number) => {
-        const newGridNotes = [...gridNotes];
+        const newGridNotes = [...gridNotesRef.current];
         newGridNotes[pitch][beat] = !newGridNotes[pitch][beat];
-        setGridNotes(newGridNotes);
 
-        // Update the grid in the store if grid exists
         if (grid) {
             const newNotes: GridNote[] = newGridNotes.flatMap((row, pitchIndex) =>
                 row.map((isActive, beatIndex) => (isActive ? { pitch: pitchIndex, startTime: beatIndex } : null)).filter(Boolean) as GridNote[]
@@ -45,14 +39,39 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             const updatedGrid: Grid = {
                 notes: newNotes,
                 numColumns: grid.numColumns,
-                currentBeat: 0,
             };
 
             setGrid(gridIndex, updatedGrid);
         }
     };
 
-    const currentBeat = grid?.currentBeat ?? 0;
+    // Listen for the SET_CURRENT_BEAT event and update the currentBeat state
+    useEffect(() => {
+        const handleCurrentBeatEvent = (event: CustomEvent<{ currentBeat: number }>) => {
+            const currentBeat = Number(event.detail);
+            // Clear previous highlights from all columns
+            cellRefs.current.forEach(row => row.forEach(cell => {
+                if (cell) {
+                    cell.classList.remove('highlight');
+                }
+            }));
+
+            // Highlight the entire beat column across all rows
+            const beatToHighlight = currentBeat % (grid?.numColumns || 1);
+            cellRefs.current.forEach(row => {
+                const currentCell = row[beatToHighlight];
+                if (currentCell) {
+                    currentCell.classList.add('highlight');
+                }
+            });
+        };
+
+        window.addEventListener('SET_CURRENT_BEAT', handleCurrentBeatEvent as EventListener);
+
+        return () => {
+            window.removeEventListener('SET_CURRENT_BEAT', handleCurrentBeatEvent as EventListener);
+        };
+    }, [grid]);
 
     return (
         <section
@@ -60,12 +79,12 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             style={{ gridTemplateColumns: `repeat(${grid ? grid.numColumns : 0}, var(--cell-size))` }}
         >
             {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => (
-                // Directly mapping the pitches to grid cells
                 Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
                     <div
                         key={`${pitch}-${beat}`}
+                        ref={el => (cellRefs.current[pitch][beat] = el)}
                         onClick={() => toggleNote(pitch, beat)}
-                        className={`grid-cell ${gridNotes[pitch][beat] ? 'active' : ''} ${beat === currentBeat ? 'highlight' : ''}`}
+                        className={`grid-cell ${gridNotesRef.current[pitch][beat] ? 'active' : ''}`}
                     />
                 ))
             ))}

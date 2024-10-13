@@ -10,7 +10,6 @@ export interface GridNote {
 export interface Grid {
     notes: GridNote[];
     numColumns: number;
-    currentBeat: number;
 }
 
 interface MusicState {
@@ -20,8 +19,6 @@ interface MusicState {
     grids: Grid[];
     setGrid: (gridIndex: number, grid: Grid) => void; // Specify that grid is of type Grid
     setNumColumns: (gridIndex: number, numColumns: number) => void;
-    updateGridBeat: (gridIndex: number) => void;
-    resetAllCurrentBeats: () => void;
 
     inputChannels: number[];
     setInputChannels: (channels: number[]) => void;
@@ -67,8 +64,8 @@ const useMusicStore = create<MusicState>((set) => ({
         }),
 
     grids: [
-        { notes: [], numColumns: 3, currentBeat: 0, },
-        { notes: [], numColumns: 4, currentBeat: 0, },
+        { notes: [], numColumns: 3, },
+        { notes: [], numColumns: 4, },
     ],
     setGrid: (gridIndex: number, grid: Grid) =>
         set((state) => {
@@ -76,26 +73,10 @@ const useMusicStore = create<MusicState>((set) => ({
             newGrids[gridIndex] = grid;
             return { grids: newGrids };
         }),
-    updateGridBeat: (gridIndex) => {
-        set((state) => {
-            const grid = state.grids[gridIndex];
-
-            if (!grid) return state;
-
-            const updatedGrids = [...state.grids];
-            updatedGrids[gridIndex] = {
-                ...grid,
-                currentBeat: (grid.currentBeat + 1) % grid.numColumns,
-            };
-
-            return { grids: updatedGrids };
-        });
-    },
     resetAllCurrentBeats: () => {
         set((state) => {
             const updatedGrids = state.grids.map((grid) => ({
                 ...grid,
-                currentBeat: 0,
             }));
             return { grids: updatedGrids };
         });
