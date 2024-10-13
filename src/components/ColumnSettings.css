@@ -1,5 +1,10 @@
 /* src/components/ColumnSettings.css */
 
+.column-settings-component{
+    min-height: var(--grid-header-height);
+    max-height: var(--grid-header-height);
+}
+
 .column-size-input {
     width: 2em;
     text-align: right;

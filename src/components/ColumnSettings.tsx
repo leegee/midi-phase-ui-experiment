@@ -21,7 +21,7 @@ const ColumnSettings: React.FC<ColumnSettingsProps> = ({ gridIndex }) => {
     };
 
     return (
-        <section className='padded-container'>
+        <section className='column-settings-component'>
             <label htmlFor={`num-columns-${gridIndex}`}>Size:</label>
             <input
                 className='column-size-input'

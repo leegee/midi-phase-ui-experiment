@@ -1,8 +1,13 @@
 /* components/Grids.css */
 
+:root {
+  --grid-header-height: 2.5em;
+}
+
 .grids-component {
+  margin-top: var(--midi-app-container-padding);
   display: flex;
-  gap: 1em;
+  gap: var(--midi-app-container-padding);
   height: calc( var(--midi-grid-cell-size) * 12);
   overflow-x: hidden;
   overflow-y: auto;
@@ -11,7 +16,6 @@
 .grid-wrapper {
   display: flex;
   flex-direction: column; 
-  border: 1pt solid grey;
 }
 
 .column {

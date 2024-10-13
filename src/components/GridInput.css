@@ -2,7 +2,6 @@
 
 .grid-component {
     display: flex; 
-    margin: 1em;
     border: var(--midi-app-container-border);
 }
 
