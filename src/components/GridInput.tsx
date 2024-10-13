@@ -36,27 +36,39 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         setGrid(gridIndex, updatedGrid);
     };
 
-    // Handle resizing the grid
-    const handleResize = (e: React.MouseEvent<HTMLDivElement>) => {
+    const debounce = (func: Function, delay: number) => {
+        let timeoutId: NodeJS.Timeout;
+        return (...args: any[]) => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            timeoutId = setTimeout(() => {
+                func(...args);
+            }, delay);
+        };
+    };
+
+    const handleResize = debounce((e: React.MouseEvent<HTMLDivElement>) => {
         if (!gridRef.current) return;
 
         const newWidth = e.clientX - gridRef.current.getBoundingClientRect().left;
         const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--midi-grid-cell-size'));
         const newNumColumns = Math.floor(newWidth / cellSize);
 
-        if (newNumColumns > 0) {
+        if (newNumColumns > 0 && newNumColumns !== grid.numColumns) {
+            console.log(newNumColumns, grid.numColumns);
             const updatedGrid: Grid = {
                 ...grid,
                 numColumns: newNumColumns,
-                notes: grid.notes.slice(0, newNumColumns) // adjust notes if needed
+                notes: grid.notes.slice(0, newNumColumns)
             };
             setGrid(gridIndex, updatedGrid);
         }
-    };
+    }, 10);
 
     // Handle mouse down event for resizing
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault(); // Prevent text selection
+        e.preventDefault();
 
         const onMouseMove = (event: MouseEvent) => {
             handleResize(event as unknown as React.MouseEvent<HTMLDivElement>);
