@@ -1,0 +1,17 @@
+.piano-legend {
+    display: flex;
+    flex-direction: column;
+}
+
+.key {
+    width: var(--midi-grid-cell-size);
+    height: var(--midi-grid-cell-size);
+    position: relative;
+}
+
+.black {
+    background: black;
+    width: var(--midi-grid-cell-size);
+    position: absolute;
+    width: var(--midi-grid-cell-size);
+}

@@ -1,25 +1,17 @@
 /* src/components/GridInput.css */
 
-:root {
-    --cell-size: 20pt; 
-    --grid-background: lightgray; 
-    --selected-background: lightblue;
-    --current-beat-background: lightgreen;
-    --current-beat-selected-background: green;
-}
-
 .grid-component {
     display: grid;
     margin: 1em;
     overflow-y: auto;
     border: var(--midi-app-container-border);
-    height: calc(var(--cell-size) * 12 );
+    height: calc(var(--midi-grid-cell-size) * 12 );
 }
 
 .grid-cell {
-    width: var(--cell-size);
-    height: var(--cell-size);
-    background-color: var(--grid-background);
+    width: var(--midi-grid-cell-size);
+    height: var(--midi-grid-cell-size);
+    background-color: var(--midi-grid-bg);
     border: 1px solid black;
     cursor: pointer;
     box-sizing: border-box;
@@ -30,9 +22,9 @@
 }
 
 .grid-cell.highlight {
-    background-color: var(--current-beat-background); 
+    background-color: var(--midi-grid-current-beat-background); 
 }
 
 .grid-cell.active.highlight {
-    background-color:var(--current-beat-selected-background);
+    background-color:var(--midi-grid-current-beat-selected-background);
 }

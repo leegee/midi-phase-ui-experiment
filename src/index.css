@@ -5,10 +5,18 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
 
+:root {
   --midi-app-input-margin-left: 0.6em;
   --midi-app-container-padding: 0.6em;
   --midi-app-container-border: 1pt solid grey;
+
+    --midi-grid-cell-size: 20pt; 
+    --midi-grid-bg: lightgray; 
+    --selected-background: lightblue;
+    --midi-grid-current-beat-background: lightgreen;
+    --midi-grid-current-beat-selected-background: green;
 }
 
 code {
