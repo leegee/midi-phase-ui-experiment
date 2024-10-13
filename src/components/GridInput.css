@@ -12,10 +12,10 @@
 }
 
 .grid-cell {
-    width: var(--midi-grid-cell-size);
-    height: var(--midi-grid-cell-size);
-    background-color: var(--midi-grid-bg);
-    border: 1px solid var(--midi-grid-border-clor);
+    width: var(--midi-app-grid-cell-size);
+    height: var(--midi-app-grid-cell-size);
+    background-color: var(--midi-app-grid-bg);
+    border: 1px solid var(--midi-app-grid-border-clor);
     cursor: pointer;
 }
 
@@ -24,11 +24,11 @@
 }
 
 .grid-cell.highlight {
-    background-color: var(--midi-grid-current-beat-background); 
+    background-color: var(--midi-app-grid-current-beat-background); 
 }
 
 .grid-cell.active.highlight {
-    background-color: var(--midi-grid-current-beat-selected-background);
+    background-color: var(--midi-app-grid-current-beat-selected-background);
 }
 
 .resizer {
@@ -38,6 +38,6 @@
     top: 0;
     right: -1pt;
     width: 4pt; 
-    background-color: var(--midi-grid-border-clor);
+    background-color: var(--midi-app-grid-border-clor);
     margin: 0;
 }

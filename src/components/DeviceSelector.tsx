@@ -24,8 +24,10 @@ const DeviceSelector: React.FC = () => {
     } = useStore();
 
     return (
-        <div>
-            <button onClick={() => setIsModalOpen(true)}>Device Set-up</button>
+        <section>
+            <div className='padded-container'>
+                <button onClick={() => setIsModalOpen(true)}>Device Set-up</button>
+            </div>
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title='Select MIDI Devices'>
                 <section className='device-selector-component'>
@@ -82,7 +84,7 @@ const DeviceSelector: React.FC = () => {
                     </div>
                 </section>
             </Modal>
-        </div>
+        </section>
     );
 };
 

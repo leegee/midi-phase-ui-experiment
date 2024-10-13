@@ -16,7 +16,6 @@ const Grids: React.FC = () => {
                     <GridInput gridIndex={gridIndex} />
                 </section>
             ))}
-
         </section>
     );
 };

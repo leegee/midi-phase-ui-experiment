@@ -16,12 +16,12 @@ body {
   --midi-app-container-padding: 0.6em;
   --midi-app-container-border: 1pt solid grey;
 
-    --midi-grid-cell-size: 20pt; 
-    --midi-grid-bg: lightgray; 
-    --midi-grid-border-clor: black;
-    --selected-background: lightblue;
-    --midi-grid-current-beat-background: lightgreen;
-    --midi-grid-current-beat-selected-background: green;
+  --midi-app-grid-cell-size: 20pt; 
+  --midi-app-grid-bg: lightgray; 
+  --midi-app-grid-border-clor: black;
+  --selected-background: lightblue;
+  --midi-app-grid-current-beat-background: lightgreen;
+  --midi-app-grid-current-beat-selected-background: green;
 }
 
 code {

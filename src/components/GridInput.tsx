@@ -52,7 +52,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         if (!gridRef.current) return;
 
         const newWidth = e.clientX - gridRef.current.getBoundingClientRect().left;
-        const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--midi-grid-cell-size'));
+        const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--midi-app-grid-cell-size'));
         const newNumColumns = Math.floor(newWidth / cellSize);
 
         if (newNumColumns > 0 && newNumColumns !== grid.numColumns) {
