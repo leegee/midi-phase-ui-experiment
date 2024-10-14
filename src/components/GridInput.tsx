@@ -5,12 +5,12 @@ import useMusicStore, { GridNote, Grid } from '../store';
 const GRID_PITCH_RANGE = 88;
 
 interface GridInputProps {
-    gridIndex: number;
+    gridIndex: number; // This prop needs to be passed to the component
 }
 
 const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
-    const { grids, setGrid } = useMusicStore();
-    const grid = grids[gridIndex];
+    const { grids, setGrid } = useMusicStore(); // Make sure this hook returns the correct state
+    const grid = grids[gridIndex]; // Get the grid based on the gridIndex
     const gridRef = useRef<HTMLDivElement | null>(null);
     const cellRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: GRID_PITCH_RANGE }, () => Array(grid ? grid.numColumns : 0).fill(null)));
 
@@ -19,7 +19,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
 
     // Function to toggle note presence on the grid
     const toggleNote = useCallback((pitch: number, beat: number, velocity: number = 100) => {
-        const newNotes: GridNote[] = [...grid.notes];
+        const newNotes: GridNote[] = [...(grid.notes || [])]; // Ensure grid.notes is not null
         const noteIndex = newNotes.findIndex(note => note.pitch === pitch && note.startTime === beat);
 
         if (noteIndex > -1) {
@@ -32,7 +32,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             }
         } else {
             // Add a new note if it does not exist
-            newNotes.push({ pitch, startTime: beat, velocity }); // Set the velocity
+            newNotes.push({ pitch, startTime: beat, velocity });
         }
 
         const updatedGrid: Grid = {
@@ -115,6 +115,30 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         };
     }, [grid]);
 
+    const handleResizerMouseDown = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const initialX = e.clientX;
+        const initialNumColumns = grid.numColumns;
+
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+            const deltaX = moveEvent.clientX - initialX;
+            const newNumColumns = Math.max(1, initialNumColumns + Math.floor(deltaX / 20));
+            const updatedGrid: Grid = {
+                notes: grid.notes,
+                numColumns: newNumColumns,
+            };
+            setGrid(gridIndex, updatedGrid);
+        };
+
+        const handleMouseUp = () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+    };
+
     return (
         <section className="grid-component" ref={gridRef}>
             {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
@@ -133,7 +157,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                     })}
                 </div>
             ))}
-            <div className="resizer" />
+            <div className="resizer" onMouseDown={handleResizerMouseDown} />
         </section>
     );
 };

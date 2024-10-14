@@ -38,6 +38,6 @@
     top: 0;
     right: -1pt;
     width: 4pt; 
-    background-color: var(--midi-app-grid-border-clor);
+    background: 3pt double var(--midi-app-grid-border-clor);
     margin: 0;
 }
