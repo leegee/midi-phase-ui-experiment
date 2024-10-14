@@ -1,6 +1,6 @@
 // components/StepInput.tsx
-import React, { useRef, useState } from 'react';
-import useMusicStore, { GridNote, Grid } from '../store';
+import React, { useState } from 'react';
+import useMusicStore, { GridNote } from '../store';
 
 const NOTE_ON = 144;
 
@@ -9,11 +9,10 @@ interface StepInputProps {
 }
 
 const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
-    const { grids, setGrid } = useMusicStore();
+    const { grids, selectedInput, addNoteToGrid } = useMusicStore();
     const grid = grids[gridIndex];
     const [isStepInputActive, setIsStepInputActive] = useState(false);
     const [currentBeat, setCurrentBeat] = useState(0);
-    const midiInputsRef = useRef<WebMidi.MIDIInput[]>([]);
 
     const handleMIDIMessage = (event: WebMidi.MIDIMessageEvent) => {
         const [status, note, velocity] = event.data;
@@ -36,32 +35,20 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
     };
 
     const startListening = () => {
-        console.log('STEP start');
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess().then((midiAccess) => {
-                midiAccess.inputs.forEach((input) => {
-                    input.onmidimessage = handleMIDIMessage;
-                    midiInputsRef.current.push(input);
-                });
-            });
+        console.log('Step input: start');
+        if (selectedInput) {
+            selectedInput.onmidimessage = handleMIDIMessage;
         }
     };
 
     const stopListening = () => {
-        console.log('STEP stop');
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess().then(() => {
-                midiInputsRef.current.forEach((input) => {
-                    input.onmidimessage = null;
-                });
-                midiInputsRef.current = [];
-            });
+        console.log('Step input: stop');
+        if (selectedInput) {
+            selectedInput.onmidimessage = null;
         }
     };
 
     const placeNote = (pitch: number, velocity: number) => {
-        console.log(1, isStepInputActive);
-        console.log(2);
         // Create a new note at the current beat
         const newNote: GridNote = {
             pitch,
@@ -69,24 +56,7 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
             velocity,
         };
 
-        // Create a copy of the current notes
-        const updatedNotes = [...grid.notes];
-
-        // Insert the new note at the position of currentBeat
-        if (currentBeat < updatedNotes.length) {
-            updatedNotes[currentBeat] = newNote;
-        } else {
-            updatedNotes.push(newNote);
-        }
-
-        console.log(updatedNotes)
-
-        const updatedGrid: Grid = {
-            notes: updatedNotes,
-            numColumns: grid.numColumns,
-        };
-
-        setGrid(gridIndex, updatedGrid);
+        addNoteToGrid(gridIndex, currentBeat, newNote);
 
         // Increment current beat
         setCurrentBeat(prevBeat => {
@@ -96,7 +66,7 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
                 toggleStepInputMode();
                 return 0; // Reset current beat for the next activation
             }
-            console.log('beat set:', prevBeat, nextBeat);
+            console.log('beat set from', prevBeat, 'to', nextBeat);
             return nextBeat;
         });
     };

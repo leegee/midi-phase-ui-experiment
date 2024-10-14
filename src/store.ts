@@ -20,6 +20,7 @@ interface MusicState {
     setGrid: (gridIndex: number, grid: Grid) => void;
     setNumColumns: (gridIndex: number, numColumns: number) => void;
     updateNoteVelocity: (gridIndex: number, noteIndex: number, velocity: number) => void;
+    addNoteToGrid: (gridIndex: number, noteIndex: number, note: GridNote) => void;
 
     inputChannels: number[];
     setInputChannels: (channels: number[]) => void;
@@ -86,6 +87,27 @@ const useMusicStore = create<MusicState>((set) => ({
             newGrids[gridIndex] = grid;
             return { grids: newGrids };
         }),
+
+    addNoteToGrid: (gridIndex, noteIndex, note) => set((state) => {
+        const updatedNotes = [...state.grids[gridIndex].notes];
+
+        // while (updatedNotes.length <= noteIndex) {
+        //     updatedNotes.push({ pitch: 0, startTime: 0, velocity: 0 }); 
+        // }
+
+        updatedNotes[noteIndex] = note;
+
+        const updatedGrid: Grid = {
+            notes: updatedNotes,
+            numColumns: state.grids[gridIndex].numColumns,
+        };
+
+        const newGrids = [...state.grids];
+        newGrids[gridIndex] = updatedGrid;
+
+        return { grids: newGrids };
+    }),
+
     resetAllCurrentBeats: () => {
         set((state) => {
             const updatedGrids = state.grids.map((grid) => ({
