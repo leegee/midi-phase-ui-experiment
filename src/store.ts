@@ -23,7 +23,6 @@ interface MusicState {
     setGrid: (gridIndex: number, grid: Grid) => void;
     setNumColumns: (gridIndex: number, numColumns: number) => void;
     updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) => void;
-    addNoteToGrid: (gridIndex: number, beatIndex: number, note: GridNote) => void;
     setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) => void;
 
     inputChannels: number[];
@@ -102,34 +101,21 @@ const useMusicStore = create<MusicState>((set) => ({
             const newGrids = [...state.grids];
             const selectedGrid = newGrids[gridIndex];
 
-            console.log('setOrUpdateNoteInGrid beatIndex', beatIndex, 'pitch', note.pitch, 'note', note)
+            console.log('setOrUpdateNoteInGrid grid', gridIndex, 'beatIndex', beatIndex, 'pitch', note.pitch, 'note', note)
 
             if (note.velocity === 0) {
                 delete selectedGrid.beats[beatIndex].notes[note.pitch];
-            } else {
+                console.log('setOrUpdateNoteInGrid deleted grid/beatIndex', gridIndex, '/', beatIndex, 'pitch', note.pitch);
+            }
+            else {
                 // Ensure the beat exists
+                console.log('setOrUpdateNoteInGrid added to grid ', gridIndex, 'beatIndex', beatIndex, 'pitch', note.pitch, 'note', note)
                 if (!selectedGrid.beats[beatIndex]) {
                     selectedGrid.beats[beatIndex] = { notes: {} };
                 }
 
                 selectedGrid.beats[beatIndex].notes[note.pitch] = note;
             }
-
-            return { grids: newGrids };
-        }),
-
-    addNoteToGrid: (gridIndex, beatIndex, note) =>
-        set((state) => {
-            const newGrids = [...state.grids];
-            const selectedGrid = newGrids[gridIndex];
-
-            // Ensure the beat exists
-            if (!selectedGrid.beats[beatIndex]) {
-                selectedGrid.beats[beatIndex] = { notes: {} }; // Create the beat if it doesn't exist
-            }
-
-            // Add the note to the dictionary
-            selectedGrid.beats[beatIndex].notes[note.pitch] = note;
 
             return { grids: newGrids };
         }),

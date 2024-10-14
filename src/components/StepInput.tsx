@@ -1,6 +1,6 @@
-// components/StepInput.tsx
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import useMusicStore, { GridNote } from '../store';
+import { BASE_PITCH } from './PlayMIDI';
 
 const NOTE_ON = 144;
 
@@ -9,10 +9,9 @@ interface StepInputProps {
 }
 
 const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
-    const { grids, selectedInput, addNoteToGrid, inputChannels } = useMusicStore();
+    const { grids, selectedInput, setOrUpdateNoteInGrid, inputChannels } = useMusicStore();
     const grid = grids[gridIndex];
-    const [isStepInputActive, setIsStepInputActive] = useState(false);
-    const [currentBeat, setCurrentBeat] = useState(0);
+    const currentBeatRef = useRef(0); // Use ref for current beat
 
     const handleMIDIMessage = (event: WebMidi.MIDIMessageEvent) => {
         const [status, note, velocity] = event.data;
@@ -27,11 +26,10 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
     };
 
     const toggleStepInputMode = () => {
-        setIsStepInputActive(prev => !prev);
-        if (isStepInputActive) {
+        if (currentBeatRef.current > 0) {
             // Reset current beat when exiting step input mode
-            setCurrentBeat(0);
-            stopListening();
+            currentBeatRef.current = 0;
+            stopListening(); // Call stopListening when exiting
         } else {
             startListening();
         }
@@ -52,36 +50,34 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
     };
 
     const placeNote = (pitch: number, velocity: number) => {
-        // Create a new note at the current beat (we no longer need a startTime, as it's based on the beat index)
+        // Create a new note at the current beat
         const newNote: GridNote = {
-            pitch,
+            pitch: pitch - BASE_PITCH,
             velocity,
         };
 
+        console.log('Placing note at beat:', currentBeatRef.current);
+
         // Add the note to the current beat in the grid
-        addNoteToGrid(gridIndex, currentBeat, newNote);
+        setOrUpdateNoteInGrid(gridIndex, currentBeatRef.current, newNote);
 
         // Increment current beat
-        setCurrentBeat(prevBeat => {
-            const nextBeat = prevBeat + 1;
-            // Deactivate mode if the next beat exceeds the number of columns
-            if (nextBeat >= grid.numColumns) {
-                toggleStepInputMode(); // Automatically stop if out of bounds
-                return 0; // Reset current beat for the next activation
-            }
-            console.log('beat set from', prevBeat, 'to', nextBeat);
-            return nextBeat;
-        });
+        const nextBeat = currentBeatRef.current + 1;
+        // Check if the next beat exceeds the number of columns
+        if (nextBeat >= grid.numColumns) {
+            toggleStepInputMode(); // Automatically stop if out of bounds
+            currentBeatRef.current = 0; // Reset current beat for the next activation
+        } else {
+            currentBeatRef.current = nextBeat; // Update the current beat
+            console.log('beat set from', currentBeatRef.current - 1, 'to', nextBeat);
+        }
     };
 
     return (
         <div>
             <button onClick={toggleStepInputMode}>
-                {isStepInputActive ? 'Stop' : 'Step Input'}
+                {currentBeatRef.current > 0 ? 'Stop' : 'Step Input'}
             </button>
-            <div>
-                Current Beat: {currentBeat}
-            </div>
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import useStore from '../store';
 
-const BASE_PITCH = 21;
+export const BASE_PITCH = 21;
 const NOTE_ON = 0x90;
 const NOTE_OFF = 0x80;
 
