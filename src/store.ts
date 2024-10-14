@@ -88,25 +88,28 @@ const useMusicStore = create<MusicState>((set) => ({
             return { grids: newGrids };
         }),
 
-    addNoteToGrid: (gridIndex, noteIndex, note) => set((state) => {
-        const updatedNotes = [...state.grids[gridIndex].notes];
+    addNoteToGrid: (gridIndex, noteIndex, note) =>
+        set((state) => {
+            console.log('enter addNoteToGrid')
+            const updatedNotes = [...state.grids[gridIndex].notes];
 
-        // while (updatedNotes.length <= noteIndex) {
-        //     updatedNotes.push({ pitch: 0, startTime: 0, velocity: 0 }); 
-        // }
+            // while (updatedNotes.length <= noteIndex) {
+            //     updatedNotes.push({ pitch: 0, startTime: 0, velocity: 0 }); 
+            // }
 
-        updatedNotes[noteIndex] = note;
+            updatedNotes[noteIndex] = note;
 
-        const updatedGrid: Grid = {
-            notes: updatedNotes,
-            numColumns: state.grids[gridIndex].numColumns,
-        };
+            const updatedGrid: Grid = {
+                notes: updatedNotes,
+                numColumns: state.grids[gridIndex].numColumns,
+            };
 
-        const newGrids = [...state.grids];
-        newGrids[gridIndex] = updatedGrid;
+            const newGrids = [...state.grids];
+            newGrids[gridIndex] = updatedGrid;
 
-        return { grids: newGrids };
-    }),
+            console.log('added note to create newGrids:', newGrids);
+            return { grids: newGrids };
+        }),
 
     resetAllCurrentBeats: () => {
         set((state) => {
@@ -117,7 +120,7 @@ const useMusicStore = create<MusicState>((set) => ({
         });
     },
 
-    inputChannels: [1],
+    inputChannels: Array.from({ length: 16 }, (_, index) => index),
     setInputChannels: (channels) => set({ inputChannels: channels }),
 
     outputChannel: 1,
