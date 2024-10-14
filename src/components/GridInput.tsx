@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './GridInput.css';
 import useMusicStore, { GridNote, Grid } from '../store';
 
@@ -18,7 +18,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     const [draggingNote, setDraggingNote] = useState<GridNote | null>(null);
 
     // Function to toggle note presence on the grid
-    const toggleNote = (pitch: number, beat: number, velocity: number = 100) => {
+    const toggleNote = useCallback((pitch: number, beat: number, velocity: number = 100) => {
         const newNotes: GridNote[] = [...grid.notes];
         const noteIndex = newNotes.findIndex(note => note.pitch === pitch && note.startTime === beat);
 
@@ -41,7 +41,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         };
 
         setGrid(gridIndex, updatedGrid);
-    };
+    }, [grid.notes, grid.numColumns, gridIndex, isCtrlPressed, setGrid]);
 
     const handleMouseDown = (pitch: number, beat: number, e: React.MouseEvent) => {
         if (e.ctrlKey) {
@@ -53,12 +53,12 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         }
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = useCallback((e: MouseEvent) => {
         if (draggingNote && isCtrlPressed && gridRef.current) {
-            const velocity = Math.max(0, Math.min(127, 127 - e.clientY / 4)); // Scale velocity based on drag
+            const velocity = Math.max(0, Math.min(127, 127 - e.clientY / 4));
             toggleNote(draggingNote.pitch, draggingNote.startTime, velocity);
         }
-    };
+    }, [draggingNote, isCtrlPressed, toggleNote]);
 
     const handleMouseUp = () => {
         setIsCtrlPressed(false);
@@ -79,7 +79,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isCtrlPressed, draggingNote]);
+    }, [isCtrlPressed, draggingNote, handleMouseMove]);
 
     const calculateOpacity = (velocity: number) => {
         return velocity / 127; // Normalize velocity to opacity range [0, 1]
