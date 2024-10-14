@@ -43,7 +43,7 @@ const PlayPauseButton: React.FC = () => {
 
         if (!intervalRef.current) {
             console.debug('Starting interval');
-            // scheduleNotes();
+            scheduleNotes();
             intervalRef.current = window.setInterval(scheduleNotes, intervalDuration);
         }
     }, [scheduleNotes, intervalDuration]);
