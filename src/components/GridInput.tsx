@@ -35,6 +35,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             } else {
                 // Remove the note if it exists and CTRL is not pressed
                 delete notes[pitch];
+                console.log('toggleNote remove note from ', gridIndex, 'beat', beatIndex, pitch);
                 setOrUpdateNoteInGrid(gridIndex, beatIndex, { pitch, velocity: 0 }); // Use a default velocity if needed
             }
         } else {
