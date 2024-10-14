@@ -2,7 +2,7 @@ import './PianoLegend.css';
 
 const PianoLegend: React.FC = () => {
     const getPianoNotes = () => {
-        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const noteNames = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
         const notes = [];
         const totalKeys = 88;
         const firstNoteIndex = 21; // A0 in MIDI is 21, which corresponds to the first key of a standard piano
