@@ -15,7 +15,7 @@
     width: var(--midi-app-grid-cell-size);
     height: var(--midi-app-grid-cell-size);
     background-color: var(--midi-app-grid-bg);
-    border: 1px solid var(--midi-app-grid-border-clor);
+    border: 1px solid var(--midi-app-grid-border-clr);
     cursor: pointer;
 }
 
@@ -38,6 +38,6 @@
     top: 0;
     right: -1pt;
     width: 4pt; 
-    background: 3pt double var(--midi-app-grid-border-clor);
+    background: 3pt double var(--midi-app-grid-border-clr);
     margin: 0;
 }
