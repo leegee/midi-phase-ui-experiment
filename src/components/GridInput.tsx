@@ -1,25 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './GridInput.css';
 import useMusicStore, { GridNote, Grid } from '../store';
+import StepInput from './StepInput';
 
 const GRID_PITCH_RANGE = 88;
 
 interface GridInputProps {
-    gridIndex: number; // This prop needs to be passed to the component
+    gridIndex: number;
 }
 
 const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
-    const { grids, setGrid } = useMusicStore(); // Make sure this hook returns the correct state
-    const grid = grids[gridIndex]; // Get the grid based on the gridIndex
+    const { grids, setGrid } = useMusicStore();
+    const grid = grids[gridIndex];
     const gridRef = useRef<HTMLDivElement | null>(null);
     const cellRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: GRID_PITCH_RANGE }, () => Array(grid ? grid.numColumns : 0).fill(null)));
 
     const [isCtrlPressed, setIsCtrlPressed] = useState(false);
     const [draggingNote, setDraggingNote] = useState<GridNote | null>(null);
 
-    // Function to toggle note presence on the grid
     const toggleNote = useCallback((pitch: number, beat: number, velocity: number = 100) => {
-        const newNotes: GridNote[] = [...(grid.notes || [])]; // Ensure grid.notes is not null
+        const newNotes: GridNote[] = [...(grid.notes || [])];
         const noteIndex = newNotes.findIndex(note => note.pitch === pitch && note.startTime === beat);
 
         if (noteIndex > -1) {
@@ -140,25 +140,28 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     };
 
     return (
-        <section className="grid-component" ref={gridRef}>
-            {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
-                <div key={`column-${beat}`} className="grid-column">
-                    {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
-                        const note = grid.notes.find(n => n.pitch === pitch && n.startTime === beat);
-                        return (
-                            <div
-                                key={`${pitch}-${beat}`}
-                                ref={el => (cellRefs.current[pitch][beat] = el)}
-                                onMouseDown={(e) => handleMouseDown(pitch, beat, e)}
-                                className={`grid-cell ${note ? 'active' : ''}`}
-                                style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
-                            />
-                        );
-                    })}
-                </div>
-            ))}
-            <div className="resizer" onMouseDown={handleResizerMouseDown} />
-        </section>
+        <div>
+            <section className="grid-component" ref={gridRef}>
+                {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
+                    <div key={`column-${beat}`} className="grid-column">
+                        {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
+                            const note = grid.notes.find(n => n.pitch === pitch && n.startTime === beat);
+                            return (
+                                <div
+                                    key={`${pitch}-${beat}`}
+                                    ref={el => (cellRefs.current[pitch][beat] = el)}
+                                    onMouseDown={(e) => handleMouseDown(pitch, beat, e)}
+                                    className={`grid-cell ${note ? 'active' : ''}`}
+                                    style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
+                                />
+                            );
+                        })}
+                    </div>
+                ))}
+                <div className="resizer" onMouseDown={handleResizerMouseDown} />
+            </section>
+            <StepInput gridIndex={gridIndex} />
+        </div>
     );
 };
 
