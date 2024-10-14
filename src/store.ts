@@ -17,12 +17,12 @@ interface MusicState {
     setBPM: (newBPM: number) => void;
 
     grids: Grid[];
-    setGrid: (gridIndex: number, grid: Grid) => void; // Specify that grid is of type Grid
+    setGrid: (gridIndex: number, grid: Grid) => void;
     setNumColumns: (gridIndex: number, numColumns: number) => void;
+    updateNoteVelocity: (gridIndex: number, noteIndex: number, velocity: number) => void;
 
     inputChannels: number[];
     setInputChannels: (channels: number[]) => void;
-
     outputChannel: number;
     setOutputChannel: (channel: number) => void;
 
@@ -60,6 +60,19 @@ const useMusicStore = create<MusicState>((set) => ({
             if (newGrids[gridIndex]) {
                 newGrids[gridIndex].numColumns = numColumns;
             }
+            return { grids: newGrids };
+        }),
+
+    updateNoteVelocity: (gridIndex: number, noteIndex: number, velocity: number) =>
+        set((state) => {
+            const newGrids = [...state.grids];
+            const selectedGrid = newGrids[gridIndex];
+
+            const updatedNotes = selectedGrid.notes.map((note, index) =>
+                index === noteIndex ? { ...note, velocity } : note
+            );
+
+            selectedGrid.notes = updatedNotes;
             return { grids: newGrids };
         }),
 

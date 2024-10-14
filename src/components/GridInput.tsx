@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './GridInput.css';
 import useMusicStore, { GridNote, Grid } from '../store';
 
@@ -14,18 +14,25 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     const gridRef = useRef<HTMLDivElement | null>(null);
     const cellRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: GRID_PITCH_RANGE }, () => Array(grid ? grid.numColumns : 0).fill(null)));
 
+    const [isCtrlPressed, setIsCtrlPressed] = useState(false);
+    const [draggingNote, setDraggingNote] = useState<GridNote | null>(null);
+
     // Function to toggle note presence on the grid
-    // Function to toggle note presence on the grid
-    const toggleNote = (pitch: number, beat: number) => {
+    const toggleNote = (pitch: number, beat: number, velocity: number = 100) => {
         const newNotes: GridNote[] = [...grid.notes];
         const noteIndex = newNotes.findIndex(note => note.pitch === pitch && note.startTime === beat);
 
         if (noteIndex > -1) {
-            // Remove the note if it exists
-            newNotes.splice(noteIndex, 1);
+            if (isCtrlPressed) {
+                // Adjust velocity if CTRL is pressed
+                newNotes[noteIndex].velocity = velocity;
+            } else {
+                // Remove the note if it exists
+                newNotes.splice(noteIndex, 1);
+            }
         } else {
             // Add a new note if it does not exist
-            newNotes.push({ pitch, startTime: beat, velocity: 100 }); // Set a default velocity value
+            newNotes.push({ pitch, startTime: beat, velocity }); // Set the velocity
         }
 
         const updatedGrid: Grid = {
@@ -36,60 +43,52 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         setGrid(gridIndex, updatedGrid);
     };
 
-    const debounce = (func: Function, delay: number) => {
-        let timeoutId: NodeJS.Timeout;
-        return (...args: any[]) => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-            timeoutId = setTimeout(() => {
-                func(...args);
-            }, delay);
-        };
+    const handleMouseDown = (pitch: number, beat: number, e: React.MouseEvent) => {
+        if (e.ctrlKey) {
+            setIsCtrlPressed(true);
+            const note = grid.notes.find(note => note.pitch === pitch && note.startTime === beat);
+            setDraggingNote(note || { pitch, startTime: beat, velocity: 100 });
+        } else {
+            toggleNote(pitch, beat);
+        }
     };
 
-    const handleResize = debounce((e: React.MouseEvent<HTMLDivElement>) => {
-        if (!gridRef.current) return;
-
-        const newWidth = e.clientX - gridRef.current.getBoundingClientRect().left;
-        const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--midi-app-grid-cell-size'));
-        const newNumColumns = Math.floor(newWidth / cellSize);
-
-        if (newNumColumns > 0 && newNumColumns !== grid.numColumns) {
-            console.log(newNumColumns, grid.numColumns);
-            const updatedGrid: Grid = {
-                ...grid,
-                numColumns: newNumColumns,
-                notes: grid.notes.slice(0, newNumColumns)
-            };
-            setGrid(gridIndex, updatedGrid);
+    const handleMouseMove = (e: MouseEvent) => {
+        if (draggingNote && isCtrlPressed && gridRef.current) {
+            const velocity = Math.max(0, Math.min(127, 127 - e.clientY / 4)); // Scale velocity based on drag
+            toggleNote(draggingNote.pitch, draggingNote.startTime, velocity);
         }
-    }, 10);
+    };
 
-    // Handle mouse down event for resizing
-    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
+    const handleMouseUp = () => {
+        setIsCtrlPressed(false);
+        setDraggingNote(null);
+    };
 
-        const onMouseMove = (event: MouseEvent) => {
-            handleResize(event as unknown as React.MouseEvent<HTMLDivElement>);
+    // Set up event listeners for drag
+    useEffect(() => {
+        if (isCtrlPressed && draggingNote) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        } else {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
         };
+    }, [isCtrlPressed, draggingNote]);
 
-        const onMouseUp = () => {
-            // Cleanup event listeners
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', onMouseUp);
-        };
-
-        // Add event listeners for mouse move and mouse up
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+    const calculateOpacity = (velocity: number) => {
+        return velocity / 127; // Normalize velocity to opacity range [0, 1]
     };
 
     // Highlight the current beat based on a custom event
     useEffect(() => {
         const handleCurrentBeatEvent = (event: CustomEvent) => {
             const currentBeat = Number(event.detail);
-            console.log(currentBeat);
 
             // Clear previous highlights
             cellRefs.current.forEach(row => row.forEach(cell => {
@@ -120,17 +119,21 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         <section className="grid-component" ref={gridRef}>
             {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
                 <div key={`column-${beat}`} className="grid-column">
-                    {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => (
-                        <div
-                            key={`${pitch}-${beat}`}
-                            ref={el => (cellRefs.current[pitch][beat] = el)}
-                            onClick={() => toggleNote(pitch, beat)}
-                            className={`grid-cell ${grid.notes.some(note => note.pitch === pitch && note.startTime === beat) ? 'active' : ''}`}
-                        />
-                    ))}
+                    {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
+                        const note = grid.notes.find(n => n.pitch === pitch && n.startTime === beat);
+                        return (
+                            <div
+                                key={`${pitch}-${beat}`}
+                                ref={el => (cellRefs.current[pitch][beat] = el)}
+                                onMouseDown={(e) => handleMouseDown(pitch, beat, e)}
+                                className={`grid-cell ${note ? 'active' : ''}`}
+                                style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
+                            />
+                        );
+                    })}
                 </div>
             ))}
-            <div className="resizer" onMouseDown={handleMouseDown} />
+            <div className="resizer" />
         </section>
     );
 };
