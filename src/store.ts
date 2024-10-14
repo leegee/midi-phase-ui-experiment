@@ -102,13 +102,18 @@ const useMusicStore = create<MusicState>((set) => ({
             const newGrids = [...state.grids];
             const selectedGrid = newGrids[gridIndex];
 
-            // Ensure the beat exists
-            if (!selectedGrid.beats[beatIndex]) {
-                selectedGrid.beats[beatIndex] = { notes: {} }; // Create the beat if it doesn't exist
-            }
+            console.log('setOrUpdateNoteInGrid beatIndex', beatIndex, 'pitch', note.pitch, 'note', note)
 
-            // Add or update the note in the dictionary
-            selectedGrid.beats[beatIndex].notes[note.pitch] = note;
+            if (note.velocity === 0) {
+                delete selectedGrid.beats[beatIndex].notes[note.pitch];
+            } else {
+                // Ensure the beat exists
+                if (!selectedGrid.beats[beatIndex]) {
+                    selectedGrid.beats[beatIndex] = { notes: {} };
+                }
+
+                selectedGrid.beats[beatIndex].notes[note.pitch] = note;
+            }
 
             return { grids: newGrids };
         }),
