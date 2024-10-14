@@ -47,7 +47,7 @@ const useMIDI = () => {
         };
 
         getMIDI();
-    }, [setInputs, setOutputs, setError]);
+    }, [setInputs, setOutputs, setError, setSelectedInput, setSelectedOutput]);
 
     return {
         inputs,
