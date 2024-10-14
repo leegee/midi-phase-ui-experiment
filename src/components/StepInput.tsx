@@ -9,7 +9,7 @@ interface StepInputProps {
 }
 
 const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
-    const { grids, selectedInput, addNoteToGrid } = useMusicStore();
+    const { grids, selectedInput, addNoteToGrid, inputChannels } = useMusicStore();
     const grid = grids[gridIndex];
     const [isStepInputActive, setIsStepInputActive] = useState(false);
     const [currentBeat, setCurrentBeat] = useState(0);
@@ -17,9 +17,13 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
     const handleMIDIMessage = (event: WebMidi.MIDIMessageEvent) => {
         const [status, note, velocity] = event.data;
 
-        // Check if it's a note on event
-        if (status === NOTE_ON && velocity > 0) {
-            placeNote(note, velocity);
+        const channel = status & 0x0F; // Get the last 4 bits
+
+        if (inputChannels.includes(channel)) {
+            // Check if it's a note on event
+            if (status === NOTE_ON && velocity > 0) {
+                placeNote(note, velocity);
+            }
         }
     };
 
