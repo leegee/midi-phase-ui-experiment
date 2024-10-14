@@ -16,12 +16,11 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
 
     const handleMIDIMessage = (event: WebMidi.MIDIMessageEvent) => {
         const [status, note, velocity] = event.data;
-
         const channel = status & 0x0F; // Get the last 4 bits
 
         if (inputChannels.includes(channel)) {
             // Check if it's a note on event
-            if (status === NOTE_ON && velocity > 0) {
+            if ((status & 0xF0) === NOTE_ON && velocity > 0) {
                 placeNote(note, velocity);
             }
         }
@@ -53,13 +52,13 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
     };
 
     const placeNote = (pitch: number, velocity: number) => {
-        // Create a new note at the current beat
+        // Create a new note at the current beat (we no longer need a startTime, as it's based on the beat index)
         const newNote: GridNote = {
             pitch,
-            startTime: currentBeat,
             velocity,
         };
 
+        // Add the note to the current beat in the grid
         addNoteToGrid(gridIndex, currentBeat, newNote);
 
         // Increment current beat
@@ -67,7 +66,7 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
             const nextBeat = prevBeat + 1;
             // Deactivate mode if the next beat exceeds the number of columns
             if (nextBeat >= grid.numColumns) {
-                toggleStepInputMode();
+                toggleStepInputMode(); // Automatically stop if out of bounds
                 return 0; // Reset current beat for the next activation
             }
             console.log('beat set from', prevBeat, 'to', nextBeat);

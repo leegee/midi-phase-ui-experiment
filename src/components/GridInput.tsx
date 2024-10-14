@@ -10,7 +10,7 @@ interface GridInputProps {
 }
 
 const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
-    const { grids, setGrid } = useMusicStore();
+    const { grids, setGrid, updateNoteVelocity, setOrUpdateNoteInGrid } = useMusicStore();
     const grid = grids[gridIndex];
     const gridRef = useRef<HTMLDivElement | null>(null);
     const cellRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: GRID_PITCH_RANGE }, () => Array(grid ? grid.numColumns : 0).fill(null)));
@@ -19,44 +19,59 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     const [draggingNote, setDraggingNote] = useState<GridNote | null>(null);
 
     const toggleNote = useCallback((pitch: number, beat: number, velocity: number = 100) => {
-        const newNotes: GridNote[] = [...(grid.notes || [])];
-        const noteIndex = newNotes.findIndex(note => note.pitch === pitch && note.startTime === beat);
+        // Check if the beat exists and retrieve it
+        const beatIndex = beat; // You might want to determine how to get the beat index based on your implementation
+        const grid = useMusicStore.getState().grids[gridIndex]; // Get the current grid
 
-        if (noteIndex > -1) {
+        const notes = grid.beats[beatIndex]?.notes || {};
+        const existingNote = notes[pitch];
+
+        if (existingNote) {
             if (isCtrlPressed) {
                 // Adjust velocity if CTRL is pressed
-                newNotes[noteIndex].velocity = velocity;
+                existingNote.velocity = velocity;
+                // Update note velocity in the store
+                updateNoteVelocity(gridIndex, beatIndex, pitch, velocity);
             } else {
-                // Remove the note if it exists
-                newNotes.splice(noteIndex, 1);
+                // Remove the note if it exists and CTRL is not pressed
+                delete notes[pitch];
+                setOrUpdateNoteInGrid(gridIndex, beatIndex, { pitch, velocity: 0 }); // Use a default velocity if needed
             }
         } else {
             // Add a new note if it does not exist
-            newNotes.push({ pitch, startTime: beat, velocity });
+            const newNote: GridNote = { pitch, velocity };
+            setOrUpdateNoteInGrid(gridIndex, beatIndex, newNote);
         }
 
-        const updatedGrid: Grid = {
-            notes: newNotes,
-            numColumns: grid.numColumns,
-        };
+        // Set the updated grid back to the store (optional, since you already update the note)
+        setGrid(gridIndex, grid); // You can also skip this if the store methods already manage the grid
+    }, [isCtrlPressed, gridIndex, setGrid, setOrUpdateNoteInGrid, updateNoteVelocity]);
 
-        setGrid(gridIndex, updatedGrid);
-    }, [grid.notes, grid.numColumns, gridIndex, isCtrlPressed, setGrid]);
 
-    const handleMouseDown = (pitch: number, beat: number, e: React.MouseEvent) => {
+    const handleMouseDown = (pitch: number, e: React.MouseEvent<HTMLDivElement>) => {
+        const beatIndex = Number(e.currentTarget.dataset.beat);
+
         if (e.ctrlKey) {
             setIsCtrlPressed(true);
-            const note = grid.notes.find(note => note.pitch === pitch && note.startTime === beat);
-            setDraggingNote(note || { pitch, startTime: beat, velocity: 100 });
+
+            // Access the current grid from the store
+            const grid = useMusicStore.getState().grids[gridIndex];
+
+            // Check if the note exists in the specified beat
+            const note = grid.beats[beatIndex]?.notes[pitch];
+
+            // Set dragging note to the existing note or create a new one
+            setDraggingNote(note || { pitch, velocity: 100 }); // No startTime in the new store
         } else {
-            toggleNote(pitch, beat);
+            toggleNote(pitch, beatIndex); // Call toggleNote with the updated signature
         }
     };
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
         if (draggingNote && isCtrlPressed && gridRef.current) {
             const velocity = Math.max(0, Math.min(127, 127 - e.clientY / 4));
-            toggleNote(draggingNote.pitch, draggingNote.startTime, velocity);
+            const beatIndex = Number((e.currentTarget as HTMLElement)?.dataset.beat);
+            toggleNote(draggingNote.pitch, beatIndex, velocity);
         }
     }, [draggingNote, isCtrlPressed, toggleNote]);
 
@@ -70,9 +85,6 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         if (isCtrlPressed && draggingNote) {
             window.addEventListener('mousemove', handleMouseMove);
             window.addEventListener('mouseup', handleMouseUp);
-        } else {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
         }
 
         return () => {
@@ -123,10 +135,17 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         const handleMouseMove = (moveEvent: MouseEvent) => {
             const deltaX = moveEvent.clientX - initialX;
             const newNumColumns = Math.max(1, initialNumColumns + Math.floor(deltaX / 20));
+
+            // Create a new grid based on the existing one, but with the updated number of columns
             const updatedGrid: Grid = {
-                notes: grid.notes,
+                beats: grid.beats.map((beat, index) => ({
+                    ...beat,
+                    // Ensure that we create a new beat object if the index is less than the newNumColumns
+                    notes: index < newNumColumns ? beat.notes : {},
+                })),
                 numColumns: newNumColumns,
             };
+
             setGrid(gridIndex, updatedGrid);
         };
 
@@ -145,14 +164,18 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                 {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
                     <div key={`column-${beat}`} className="grid-column">
                         {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
-                            const note = grid.notes.find(n => n.pitch === pitch && n.startTime === beat);
+                            // Access the beat directly from the grid.beats array
+                            const beatData = grid.beats[beat]; // Get the specific beat
+                            const note = beatData ? beatData.notes[pitch] : undefined; // Access notes for that pitch
+
                             return (
                                 <div
                                     key={`${pitch}-${beat}`}
                                     ref={el => (cellRefs.current[pitch][beat] = el)}
-                                    onMouseDown={(e) => handleMouseDown(pitch, beat, e)}
+                                    onMouseDown={(e) => handleMouseDown(pitch, e)}
                                     className={`grid-cell ${note ? 'active' : ''}`}
                                     style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
+                                    data-beat={beat} // Store beat index in data attribute for now, move to column later
                                 />
                             );
                         })}
@@ -163,6 +186,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             <StepInput gridIndex={gridIndex} />
         </div>
     );
+
 };
 
 export default GridInput;

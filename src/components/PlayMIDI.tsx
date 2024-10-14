@@ -17,20 +17,21 @@ const PlayPauseButton: React.FC = () => {
         if (!selectedOutput) return;
 
         grids.forEach((grid, gridIndex) => {
-            const notes = grid.notes || [];
-            const noteToPlay = notes[currentBeat.current % (grid?.numColumns || 1)];
+            const currentBeatIndex: number = currentBeat.current % (grid.numColumns || 1); // Use currentBeat from useRef
+            const beat = grid.beats[currentBeatIndex]; // Access the current beat from the grid
 
-            if (noteToPlay) {
-                const noteOnTime = window.performance.now();
-                const noteOffTime = noteOnTime + intervalDuration;
+            if (beat) {
+                Object.values(beat.notes).forEach(noteToPlay => {
+                    const noteOnTime = window.performance.now();
+                    const noteOffTime = noteOnTime + intervalDuration;
 
-                selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + noteToPlay.pitch, noteToPlay.velocity || 100], noteOnTime);
-                selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + noteToPlay.pitch, 0], noteOffTime);
+                    selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + noteToPlay.pitch, noteToPlay.velocity || 100], noteOnTime);
+                    selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + noteToPlay.pitch, 0], noteOffTime);
+                });
             }
         });
 
         currentBeat.current = currentBeat.current + 1;
-
         window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', { detail: currentBeat.current }));
         console.debug('tick', currentBeat);
     }, [grids, selectedOutput, outputChannel, intervalDuration]);

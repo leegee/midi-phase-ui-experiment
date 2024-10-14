@@ -3,13 +3,16 @@ import { create } from 'zustand';
 
 export interface GridNote {
     pitch: number;
-    startTime: number;
     velocity: number;
 }
 
+export interface Beat {
+    notes: Record<number, GridNote>; // Dictionary indexed by pitch
+}
+
 export interface Grid {
-    notes: GridNote[];
-    numColumns: number;
+    beats: Beat[];     // An array of beats, each containing an object of notes indexed by pitch
+    numColumns: number; // Represents the number of beats (columns)
 }
 
 interface MusicState {
@@ -19,8 +22,9 @@ interface MusicState {
     grids: Grid[];
     setGrid: (gridIndex: number, grid: Grid) => void;
     setNumColumns: (gridIndex: number, numColumns: number) => void;
-    updateNoteVelocity: (gridIndex: number, noteIndex: number, velocity: number) => void;
-    addNoteToGrid: (gridIndex: number, noteIndex: number, note: GridNote) => void;
+    updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) => void;
+    addNoteToGrid: (gridIndex: number, beatIndex: number, note: GridNote) => void;
+    setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) => void;
 
     inputChannels: number[];
     setInputChannels: (channels: number[]) => void;
@@ -53,7 +57,7 @@ const useMusicStore = create<MusicState>((set) => ({
     setError: (error) => set({ error }),
 
     bpm: 120,
-    setBPM: (newBPM: number) => set({ bpm: newBPM }), // Type for newBPM
+    setBPM: (newBPM: number) => set({ bpm: newBPM }),
 
     setNumColumns: (gridIndex, numColumns) =>
         set((state) => {
@@ -64,22 +68,27 @@ const useMusicStore = create<MusicState>((set) => ({
             return { grids: newGrids };
         }),
 
-    updateNoteVelocity: (gridIndex: number, noteIndex: number, velocity: number) =>
+    updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) =>
         set((state) => {
             const newGrids = [...state.grids];
             const selectedGrid = newGrids[gridIndex];
 
-            const updatedNotes = selectedGrid.notes.map((note, index) =>
-                index === noteIndex ? { ...note, velocity } : note
-            );
+            // Ensure the beat exists
+            if (!selectedGrid.beats[beatIndex]) {
+                selectedGrid.beats[beatIndex] = { notes: {} }; // Create the beat if it doesn't exist
+            }
 
-            selectedGrid.notes = updatedNotes;
+            // Update the note velocity in the dictionary
+            if (selectedGrid.beats[beatIndex].notes[pitch]) {
+                selectedGrid.beats[beatIndex].notes[pitch].velocity = velocity;
+            }
+
             return { grids: newGrids };
         }),
 
     grids: [
-        { notes: [], numColumns: 3, },
-        { notes: [], numColumns: 4, },
+        { beats: [], numColumns: 3, },
+        { beats: [], numColumns: 4, },
     ],
     setGrid: (gridIndex: number, grid: Grid) =>
         set((state) => {
@@ -88,26 +97,35 @@ const useMusicStore = create<MusicState>((set) => ({
             return { grids: newGrids };
         }),
 
-    addNoteToGrid: (gridIndex, noteIndex, note) =>
+    setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) =>
         set((state) => {
-            console.log('enter addNoteToGrid')
-            const updatedNotes = [...state.grids[gridIndex].notes];
-
-            // while (updatedNotes.length <= noteIndex) {
-            //     updatedNotes.push({ pitch: 0, startTime: 0, velocity: 0 }); 
-            // }
-
-            updatedNotes[noteIndex] = note;
-
-            const updatedGrid: Grid = {
-                notes: updatedNotes,
-                numColumns: state.grids[gridIndex].numColumns,
-            };
-
             const newGrids = [...state.grids];
-            newGrids[gridIndex] = updatedGrid;
+            const selectedGrid = newGrids[gridIndex];
 
-            console.log('added note to create newGrids:', newGrids);
+            // Ensure the beat exists
+            if (!selectedGrid.beats[beatIndex]) {
+                selectedGrid.beats[beatIndex] = { notes: {} }; // Create the beat if it doesn't exist
+            }
+
+            // Add or update the note in the dictionary
+            selectedGrid.beats[beatIndex].notes[note.pitch] = note;
+
+            return { grids: newGrids };
+        }),
+
+    addNoteToGrid: (gridIndex, beatIndex, note) =>
+        set((state) => {
+            const newGrids = [...state.grids];
+            const selectedGrid = newGrids[gridIndex];
+
+            // Ensure the beat exists
+            if (!selectedGrid.beats[beatIndex]) {
+                selectedGrid.beats[beatIndex] = { notes: {} }; // Create the beat if it doesn't exist
+            }
+
+            // Add the note to the dictionary
+            selectedGrid.beats[beatIndex].notes[note.pitch] = note;
+
             return { grids: newGrids };
         }),
 
