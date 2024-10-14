@@ -75,7 +75,7 @@ const PlayPauseButton: React.FC = () => {
     return (
         <section className='padded-container'>
             <button onClick={handlePlayPause}>
-                {isPlaying ? 'Pause' : 'Play'}
+                {isPlaying ? '⏸︎ Pause' : '⏵︎ Play'}
             </button>
         </section>
     );
