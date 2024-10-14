@@ -15,9 +15,9 @@ const InputChannelSelector: React.FC<InputChannelSelectorProps> = ({ selectedCha
     return (
         <div>
             <select multiple value={selectedChannels.map(channel => channel.toString())} onChange={handleSelectChange}>
-                {Array.from({ length: 16 }, (_, i) => i + 1).map(channel => (
+                {Array.from({ length: 16 }, (_, i) => i).map(channel => (
                     <option key={channel} value={channel}>
-                        Channel {channel}
+                        Channel {channel + 1}
                     </option>
                 ))}
             </select>
