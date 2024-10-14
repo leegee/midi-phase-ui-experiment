@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { dispatchCurrentBeatEvent } from '../events/eventDispatcher';
 import useStore from '../store';
 
 export const BASE_PITCH = 21;
@@ -31,7 +32,7 @@ const PlayPauseButton: React.FC = () => {
             }
         });
 
-        window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', { detail: currentBeat.current }));
+        dispatchCurrentBeatEvent(currentBeat.current);
         console.debug('tick', currentBeat);
 
         currentBeat.current = currentBeat.current + 1;

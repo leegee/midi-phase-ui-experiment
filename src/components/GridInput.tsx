@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './GridInput.css';
 import useMusicStore, { GridNote, Grid } from '../store';
-import StepInput from './StepInput';
 
 const GRID_PITCH_RANGE = 88;
 
@@ -160,32 +159,29 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     };
 
     return (
-        <div>
-            <section className="grid-component" ref={gridRef}>
-                {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
-                    <div key={`column-${beat}`} className="grid-column">
-                        {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
-                            // Access the beat directly from the grid.beats array
-                            const beatData = grid.beats[beat]; // Get the specific beat
-                            const note = beatData ? beatData.notes[pitch] : undefined; // Access notes for that pitch
+        <section className="grid-component" ref={gridRef}>
+            {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
+                <div key={`column-${beat}`} className="grid-column">
+                    {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
+                        // Access the beat directly from the grid.beats array
+                        const beatData = grid.beats[beat]; // Get the specific beat
+                        const note = beatData ? beatData.notes[pitch] : undefined; // Access notes for that pitch
 
-                            return (
-                                <div
-                                    key={`${pitch}-${beat}`}
-                                    ref={el => (cellRefs.current[pitch][beat] = el)}
-                                    onMouseDown={(e) => handleMouseDown(pitch, e)}
-                                    className={`grid-cell ${note ? 'active' : ''}`}
-                                    style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
-                                    data-beat={beat} // Store beat index in data attribute for now, move to column later
-                                />
-                            );
-                        })}
-                    </div>
-                ))}
-                <div className="resizer" onMouseDown={handleResizerMouseDown} />
-            </section>
-            <StepInput gridIndex={gridIndex} />
-        </div>
+                        return (
+                            <div
+                                key={`${pitch}-${beat}`}
+                                ref={el => (cellRefs.current[pitch][beat] = el)}
+                                onMouseDown={(e) => handleMouseDown(pitch, e)}
+                                className={`grid-cell ${note ? 'active' : ''}`}
+                                style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
+                                data-beat={beat} // Store beat index in data attribute for now, move to column later
+                            />
+                        );
+                    })}
+                </div>
+            ))}
+            <div className="resizer" onMouseDown={handleResizerMouseDown} />
+        </section>
     );
 
 };

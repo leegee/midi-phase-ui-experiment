@@ -2,6 +2,7 @@
 import './Grids.css';
 import GridInput from './GridInput';
 import PianoLegend from './PianoLegend';
+import StepInput from './StepInput';
 
 const NUM_GRIDS = 2;
 
@@ -12,9 +13,10 @@ const Grids: React.FC = () => {
             <PianoLegend />
 
             {Array.from({ length: NUM_GRIDS }).map((_, gridIndex) => (
-                <section className="grid-wrapper" key={gridIndex}>
+                <div className="grid-wrapper" key={gridIndex}>
                     <GridInput gridIndex={gridIndex} />
-                </section>
+                    <StepInput gridIndex={gridIndex} />
+                </div>
             ))}
         </section>
     );
