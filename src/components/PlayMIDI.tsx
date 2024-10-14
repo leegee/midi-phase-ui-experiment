@@ -31,9 +31,10 @@ const PlayPauseButton: React.FC = () => {
             }
         });
 
-        currentBeat.current = currentBeat.current + 1;
         window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', { detail: currentBeat.current }));
         console.debug('tick', currentBeat);
+
+        currentBeat.current = currentBeat.current + 1;
     }, [grids, selectedOutput, outputChannel, intervalDuration]);
 
     const startPlayback = useCallback(() => {
