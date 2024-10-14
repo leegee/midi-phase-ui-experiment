@@ -18,7 +18,7 @@ const PlayPauseButton: React.FC = () => {
 
         grids.forEach((grid, gridIndex) => {
             const notes = grid.notes || [];
-            const noteToPlay = notes[currentBeat.current];
+            const noteToPlay = notes[currentBeat.current % (grid?.numColumns || 1)];
 
             if (noteToPlay) {
                 const noteOnTime = window.performance.now();
@@ -29,10 +29,11 @@ const PlayPauseButton: React.FC = () => {
             }
         });
 
-        window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', { detail: currentBeat.current }));
         currentBeat.current = currentBeat.current + 1;
+
+        window.dispatchEvent(new CustomEvent('SET_CURRENT_BEAT', { detail: currentBeat.current }));
         console.debug('tick', currentBeat);
-    }, [grids, selectedOutput, outputChannel, currentBeat, intervalDuration]);
+    }, [grids, selectedOutput, outputChannel, intervalDuration]);
 
     const startPlayback = useCallback(() => {
         if (!audioContextRef.current) {
@@ -41,7 +42,7 @@ const PlayPauseButton: React.FC = () => {
 
         if (!intervalRef.current) {
             console.debug('Starting interval');
-            scheduleNotes();
+            // scheduleNotes();
             intervalRef.current = window.setInterval(scheduleNotes, intervalDuration);
         }
     }, [scheduleNotes, intervalDuration]);
