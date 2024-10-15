@@ -6,9 +6,10 @@
 
 .grids-component {
   display: flex;
+  flex: 1;
   gap: var(--midi-app-container-padding);
   height: calc( var(--midi-app-grid-cell-size) * 13);
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: auto;
   border: 1pt solid var(--midi-app-container-border);
 }
@@ -30,3 +31,6 @@
   margin-bottom: 1em;
   width: 100%;
 }
+
+
+
