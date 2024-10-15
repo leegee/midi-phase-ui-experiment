@@ -10,6 +10,20 @@ interface GridInputProps {
     gridIndex: number;
 }
 
+const debounce = (func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    return (...args: any) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+
+        timeoutId = setTimeout(() => {
+            func(...args);
+        }, delay);
+    };
+};
+
 const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     const { grids, setGrid, updateNoteVelocity, setOrUpdateNoteInGrid } = useMusicStore();
     const grid = grids[gridIndex];
@@ -44,6 +58,11 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         }
     }, [isCtrlPressed, gridIndex, setOrUpdateNoteInGrid, updateNoteVelocity, grids]);
 
+    const debouncedToggleNoteRef = useRef(debounce(toggleNote, 25));
+    // Update the ref whenever toggleNote changes
+    useEffect(() => {
+        debouncedToggleNoteRef.current = debounce(toggleNote, 25);
+    }, [toggleNote]);
 
     const handleMouseDown = (pitch: number, e: React.MouseEvent<HTMLDivElement>) => {
         const beatIndex = Number(e.currentTarget.dataset.beat);
@@ -58,19 +77,25 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
 
             // Set dragging note to the existing note or create a new one
             setDraggingNote(note || { pitch, velocity: 75 });
-        }
-        else {
+        } else {
             toggleNote(pitch, beatIndex); // Call toggleNote with the updated signature
         }
     };
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
-        if (draggingNote && isCtrlPressed && gridRef.current) {
+        if (draggingNote && isCtrlPressed) {
+            if (!gridRef.current?.clientWidth) return;
+
+            // Use the dragging note's pitch and calculate the velocity based on the mouse Y position
             const velocity = Math.max(0, Math.min(127, 127 - e.clientY / 4));
-            const beatIndex = Number((e.currentTarget as HTMLElement)?.dataset.beat);
-            toggleNote(draggingNote.pitch, beatIndex, velocity);
+
+            // Instead of trying to find the beatIndex here, we can keep track of it when starting the drag
+            const beatIndex = Math.floor(e.clientX / (gridRef.current?.clientWidth / grid.numColumns)); // Adjust based on your layout
+            // toggleNote(draggingNote.pitch, beatIndex, velocity); // Use stored pitch from dragging note
+            debouncedToggleNoteRef.current(draggingNote.pitch, beatIndex, velocity); // Use debounced function
         }
-    }, [draggingNote, isCtrlPressed, toggleNote]);
+    }, [draggingNote, grid.numColumns, isCtrlPressed]);
+
 
     const handleMouseUp = () => {
         setIsCtrlPressed(false);
