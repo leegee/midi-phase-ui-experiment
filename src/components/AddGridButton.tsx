@@ -2,13 +2,18 @@
 import React from 'react';
 import useMusicStore from '../store';
 
+const MAX_GRIDS = 10;
 
 interface AddGridButtonProps {
     gridIndex: number;
 }
 
 const AddGridButton: React.FC<AddGridButtonProps> = ({ gridIndex }) => {
-    const { addGrid } = useMusicStore();
+    const { addGrid, grids } = useMusicStore();
+
+    if (grids.length > MAX_GRIDS) {
+        return (<></>);
+    }
 
     const handleAddGrid = () => {
         addGrid(gridIndex);
@@ -16,7 +21,7 @@ const AddGridButton: React.FC<AddGridButtonProps> = ({ gridIndex }) => {
 
     return (
         <div className="add-grid">
-            <button onClick={handleAddGrid}>New Grid</button>
+            <button title='Add a new grid after this one' onClick={handleAddGrid}>New</button>
         </div>
     );
 };

@@ -16,7 +16,7 @@ const RemoveGridButton: React.FC<RemoveGridButtonProps> = ({ gridIndex }) => {
 
     return (
         <div className="remove-grid">
-            <button onClick={handleRemoveGrid}>Delete</button>
+            <button title='Remove this grid' onClick={handleRemoveGrid}>Remove</button>
         </div>
     );
 };
