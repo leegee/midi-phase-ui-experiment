@@ -41,3 +41,7 @@
     background: 3pt double var(--midi-app-grid-border-clr);
     margin: 0;
 }
+
+.resizer:hover {
+    background-color: orange;
+}

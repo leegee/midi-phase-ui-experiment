@@ -20,8 +20,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
     const [draggingNote, setDraggingNote] = useState<GridNote | null>(null);
 
     const toggleNote = useCallback((pitch: number, beatIndex: number, velocity: number = 100) => {
-        // Check if the beat exists and retrieve it
-        const grid = grids[gridIndex]; // Get the current grid
+        const grid = grids[gridIndex];
 
         const notes = grid.beats[beatIndex]?.notes || {};
         const existingNote = notes[pitch];
@@ -186,7 +185,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                     })}
                 </div>
             ))}
-            <div className="resizer" onMouseDown={handleResizerMouseDown} />
+            <div title='Click and drag to add or remove columns' className="resizer" onMouseDown={handleResizerMouseDown} />
         </section>
     );
 
