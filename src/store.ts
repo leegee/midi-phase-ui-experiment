@@ -14,9 +14,72 @@ export interface MergedBeat {
     notes: Record<number, GridNote>; // Merged notes indexed by pitch
 }
 
-export interface Grid {
+export class Grid {
     beats: Beat[];
     numColumns: number;
+
+    constructor(numColumns: number);
+
+    constructor(params: { beats: { notes: Record<number, GridNote> }[]; numColumns: number });
+
+    constructor(arg: number | { beats: { notes: Record<number, GridNote> }[]; numColumns: number }) {
+        if (typeof arg === 'number') {
+            this.numColumns = arg;
+            this.beats = Array.from({ length: arg }, () => ({ notes: {} })); // Initialize beats if needed
+        } else {
+            this.numColumns = arg.numColumns;
+            this.beats = arg.beats;
+        }
+    }
+
+    clear() {
+        this.beats = [];
+    }
+
+    setNumColumns(numColumns: number) {
+        this.numColumns = numColumns;
+    }
+
+    updateNoteVelocity(beatIndex: number, pitch: number, velocity: number) {
+        if (!this.beats[beatIndex]) {
+            this.beats[beatIndex] = { notes: {} }; // Create the beat if it doesn't exist
+        }
+
+        const beat = this.beats[beatIndex];
+
+        // Update the note velocity in the dictionary
+        if (beat.notes[pitch]) {
+            beat.notes[pitch].velocity = velocity;
+        }
+    }
+
+    setOrUpdateNote(beatIndex: number, note: GridNote) {
+        if (note.velocity === 0) {
+            delete this.beats[beatIndex].notes[note.pitch];
+        } else {
+            if (!this.beats[beatIndex]) {
+                this.beats[beatIndex] = { notes: {} };
+            }
+            this.beats[beatIndex].notes[note.pitch] = note;
+        }
+    }
+}
+
+export class MergedBeat {
+    notes: Record<number, GridNote>;
+
+    constructor() {
+        this.notes = {};
+    }
+
+    mergeWith(beat: Beat) {
+        Object.entries(beat.notes).forEach(([pitch, note]) => {
+            const numericPitch = Number(pitch);
+            if (!this.notes[numericPitch]) {
+                this.notes[numericPitch] = note;
+            }
+        });
+    }
 }
 
 interface MusicState {
@@ -67,36 +130,9 @@ const useMusicStore = create<MusicState>((set) => ({
     bpm: 120,
     setBPM: (newBPM: number) => set({ bpm: newBPM }),
 
-    setNumColumns: (gridIndex, numColumns) =>
-        set((state) => {
-            const newGrids = [...state.grids];
-            if (newGrids[gridIndex]) {
-                newGrids[gridIndex].numColumns = numColumns;
-            }
-            return { grids: newGrids };
-        }),
-
-    updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) =>
-        set((state) => {
-            const newGrids = [...state.grids];
-            const selectedGrid = newGrids[gridIndex];
-
-            // Ensure the beat exists
-            if (!selectedGrid.beats[beatIndex]) {
-                selectedGrid.beats[beatIndex] = { notes: {} }; // Create the beat if it doesn't exist
-            }
-
-            // Update the note velocity in the dictionary
-            if (selectedGrid.beats[beatIndex].notes[pitch]) {
-                selectedGrid.beats[beatIndex].notes[pitch].velocity = velocity;
-            }
-
-            return { grids: newGrids };
-        }),
-
     grids: [
-        { beats: [], numColumns: 3, },
-        { beats: [], numColumns: 4, },
+        new Grid(3),
+        new Grid(4),
     ],
     setGrid: (gridIndex: number, grid: Grid) =>
         set((state) => {
@@ -108,14 +144,14 @@ const useMusicStore = create<MusicState>((set) => ({
         set((state) => {
             const newGrids = [...state.grids];
             if (newGrids[gridIndex]) {
-                newGrids[gridIndex].beats = [];
+                newGrids[gridIndex].clear();
             }
             return { grids: newGrids };
         }),
     addGrid: (insertAfterIndex: number) =>
         set((state) => {
             const newGrids = [...state.grids];
-            newGrids.splice(insertAfterIndex + 1, 0, { beats: [], numColumns: 4 });
+            newGrids.splice(insertAfterIndex + 1, 0, new Grid(4));
             return { grids: newGrids };
         }),
     removeGrid: (gridIndex: number) =>
@@ -127,34 +163,28 @@ const useMusicStore = create<MusicState>((set) => ({
             return { grids: newGrids };
         }),
 
-    setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) =>
+    setNumColumns: (gridIndex: number, numColumns: number) =>
         set((state) => {
             const newGrids = [...state.grids];
-            const selectedGrid = newGrids[gridIndex];
-
-            if (note.velocity === 0) {
-                delete selectedGrid.beats[beatIndex].notes[note.pitch];
+            if (newGrids[gridIndex]) {
+                newGrids[gridIndex].setNumColumns(numColumns);
             }
-            else {
-                // Ensure the beat exists
-                if (!selectedGrid.beats[beatIndex]) {
-                    selectedGrid.beats[beatIndex] = { notes: {} };
-                }
-
-                selectedGrid.beats[beatIndex].notes[note.pitch] = note;
-            }
-
             return { grids: newGrids };
         }),
 
-    resetAllCurrentBeats: () => {
+    updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) =>
         set((state) => {
-            const updatedGrids = state.grids.map((grid) => ({
-                ...grid,
-            }));
-            return { grids: updatedGrids };
-        });
-    },
+            const newGrids = [...state.grids];
+            newGrids[gridIndex].updateNoteVelocity(beatIndex, pitch, velocity);
+            return { grids: newGrids };
+        }),
+
+    setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) =>
+        set((state) => {
+            const newGrids = [...state.grids];
+            newGrids[gridIndex].setOrUpdateNote(beatIndex, note);
+            return { grids: newGrids };
+        }),
 
     mergedBeats: [],
     mergeGrids: () => set((state) => {
@@ -166,7 +196,15 @@ const useMusicStore = create<MusicState>((set) => ({
 
         const merged: MergedBeat[] = [];
         for (let i = 0; i < lcmBeats; i++) {
-            merged.push(mergeBeats(grids, i));
+            const mergedBeat = new MergedBeat();
+            grids.forEach(grid => {
+                const extendedBeatIndex = i % grid.numColumns;
+                const beat = grid.beats[extendedBeatIndex];
+                if (beat) {
+                    mergedBeat.mergeWith(beat);
+                }
+            });
+            merged.push(mergedBeat);
         }
 
         return { mergedBeats: merged };
@@ -179,34 +217,12 @@ const useMusicStore = create<MusicState>((set) => ({
     setOutputChannel: (channel) => set({ outputChannel: channel }),
 }));
 
-
 const gcd = (a: number, b: number): number => {
     return b === 0 ? a : gcd(b, a % b);
 };
 
 const lcm = (a: number, b: number): number => {
     return (a * b) / gcd(a, b);
-};
-
-// Function to merge notes from multiple grids for a given beat index
-const mergeBeats = (grids: Grid[], beatIndex: number): MergedBeat => {
-    const mergedNotes: Record<number, GridNote> = {};
-
-    grids.forEach((grid) => {
-        const extendedBeatIndex = beatIndex % grid.numColumns;
-        const beat = grid.beats[extendedBeatIndex];
-
-        if (beat) {
-            Object.entries(beat.notes).forEach(([pitch, note]) => {
-                const numericPitch = Number(pitch);
-                if (!mergedNotes[numericPitch]) {
-                    mergedNotes[numericPitch] = note;
-                }
-            });
-        }
-    });
-
-    return { notes: mergedNotes };
 };
 
 export default useMusicStore;

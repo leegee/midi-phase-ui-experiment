@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './GridInput.css';
-import useMusicStore, { type GridNote, type Grid } from '../store';
+import useMusicStore, { type GridNote, Grid } from '../store';
 
 const GRID_PITCH_RANGE = 88;
 
@@ -136,14 +136,14 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             const newNumColumns = Math.max(1, initialNumColumns + Math.floor(deltaX / 20));
 
             // Create a new grid based on the existing one, but with the updated number of columns
-            const updatedGrid: Grid = {
+            const updatedGrid = new Grid({
                 beats: grid.beats.map((beat, index) => ({
                     ...beat,
                     // Ensure that we create a new beat object if the index is less than the newNumColumns
                     notes: index < newNumColumns ? beat.notes : {},
                 })),
                 numColumns: newNumColumns,
-            };
+            });
 
             setGrid(gridIndex, updatedGrid);
         };
