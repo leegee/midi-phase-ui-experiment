@@ -7,6 +7,7 @@ import useMIDI from './hooks/useMIDI';
 import DeviceSelector from './components/DeviceSelector';
 import PlayPauseButton from './components/PlayMIDI';
 import Grids from './components/Grids';
+import SaveMIDI from './components/SaveMIDI';
 
 const App: React.FC = () => {
   const { error, selectedInput, selectedOutput } = useMIDI();
@@ -21,6 +22,9 @@ const App: React.FC = () => {
         <section>
           <p>
             Select an input and output device to continue.
+          </p>
+          <p>
+            Drag a grid from the right to add or remove columns.
           </p>
           <p>
             Click a grid square to set a note, or use step input.
@@ -39,6 +43,7 @@ const App: React.FC = () => {
         <section className='app-toolbar'>
           <BPMInput />
           <PlayPauseButton />
+          <SaveMIDI />
           <DeviceSelector />
         </section>
 
