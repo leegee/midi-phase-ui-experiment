@@ -22,5 +22,10 @@
 .ctrls-wrapper {
   position: sticky;
   top: 0;
+  display: flex;
+  flex-direction: column;
 }
 
+.ctrls-wrapper > *{
+  margin-bottom: 1em;
+}

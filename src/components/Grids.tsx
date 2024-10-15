@@ -1,10 +1,12 @@
 // components/Grids.tsx
 import './Grids.css';
+import React from 'react';
 import useMusicStore from '../store';
 import GridInput from './GridInput';
 import PianoLegend from './PianoLegend';
 import StepInput from './StepInput';
 import MergedGrid from './MergedGrid.tsc';
+import ClearGridButton from './ClearGridButton';
 
 const Grids: React.FC = () => {
     const { grids } = useMusicStore();
@@ -15,14 +17,15 @@ const Grids: React.FC = () => {
                 <PianoLegend />
 
                 {Array.from({ length: grids.length }).map((_, gridIndex) => (
-                    <>
-                        <div className="grid-wrapper" key={gridIndex}>
+                    <React.Fragment key={gridIndex}>
+                        <div className="grid-wrapper" key={'grid_' + gridIndex}>
                             <GridInput gridIndex={gridIndex} />
                         </div>
-                        <div className="ctrls-wrapper" key={gridIndex}>
+                        <div className="ctrls-wrapper" key={'ctrls_' + gridIndex}>
                             <StepInput gridIndex={gridIndex} />
+                            <ClearGridButton gridIndex={gridIndex} />
                         </div>
-                    </>
+                    </React.Fragment>
                 ))}
             </section>
 
