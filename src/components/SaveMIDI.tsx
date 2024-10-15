@@ -4,7 +4,7 @@ import useMusicStore from '../store';
 import { BASE_PITCH } from './PlayMIDI';
 
 const SaveMIDIButton: React.FC = () => {
-    const { bpm, mergedBeats, outputChannel } = useMusicStore();
+    const { bpm, mergedBeats } = useMusicStore();
 
     const saveAsMIDI = () => {
         if (mergedBeats.length === 0) {
