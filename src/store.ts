@@ -25,7 +25,7 @@ export class Grid {
     constructor(arg: number | { beats: { notes: Record<number, GridNote> }[]; numColumns: number }) {
         if (typeof arg === 'number') {
             this.numColumns = arg;
-            this.beats = Array.from({ length: arg }, () => ({ notes: {} })); // Initialize beats if needed
+            this.beats = Array.from({ length: arg }, () => ({ notes: {} }));
         } else {
             this.numColumns = arg.numColumns;
             this.beats = arg.beats;
