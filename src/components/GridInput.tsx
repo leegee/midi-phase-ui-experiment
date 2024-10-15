@@ -43,9 +43,8 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             setOrUpdateNoteInGrid(gridIndex, beatIndex, newNote);
         }
 
-        // Set the updated grid back to the store (optional, since you already update the note)
-        setGrid(gridIndex, grid); // You can also skip this if the store methods already manage the grid
-    }, [isCtrlPressed, gridIndex, setGrid, setOrUpdateNoteInGrid, updateNoteVelocity]);
+        // setGrid(gridIndex, grid);
+    }, [isCtrlPressed, gridIndex, setOrUpdateNoteInGrid, updateNoteVelocity]);
 
 
     const handleMouseDown = (pitch: number, e: React.MouseEvent<HTMLDivElement>) => {
