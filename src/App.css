@@ -7,11 +7,11 @@ main {
 .app-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
   border: var(--midi-app-container-border);
 }
 
 .app-toolbar h1 {
   font-size: 1.5rem;
   opacity: 50%;
+  margin-right: auto;
 }
