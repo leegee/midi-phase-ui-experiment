@@ -22,6 +22,12 @@ const App: React.FC = () => {
           <p>
             Select an input and output device to continue.
           </p>
+          <p>
+            Click a grid square to set a note, or use step input.
+          </p>
+          <p>
+            Drag a grid square up/down to change velocity.
+          </p>
           <div>
             <DeviceSelector />
           </div>
