@@ -1,6 +1,9 @@
 // src/store.ts
 import { create } from 'zustand';
 
+const SATURATION = 70;
+const LIGHTNESS = 50;
+
 export interface GridNote {
     pitch: number;
     velocity: number;
@@ -85,7 +88,12 @@ export class MergedBeat {
         Object.entries(beat.notes).forEach(([pitch, note]) => {
             const numericPitch = Number(pitch);
             if (!this.notes[numericPitch]) {
+                // If the note doesn't exist, create a new entry with the grid's color
                 this.notes[numericPitch] = { ...note, colour: grid.colour };
+            } else {
+                // If the note already exists, merge the colors
+                const existingNote = this.notes[numericPitch];
+                existingNote.colour = mergeColors(existingNote.colour, grid.colour);
             }
         });
     }
@@ -238,9 +246,34 @@ const lcm = (a: number, b: number): number => {
     return (a * b) / gcd(a, b);
 };
 
+// Calculate hue based on index
 function colours(index: number, total: number): string {
-    const hue = (index / total) * 360; // Calculate hue based on index
-    return `hsl(${hue}, 100%, 50%)`;
+    const hue = (index / total) * 360;
+    return `hsl(${hue}, ${SATURATION}%, ${LIGHTNESS}%)`;
+}
+
+function mergeColors(existingColor: string, newColor: string): string {
+    const existingHue = parseHSL(existingColor);
+    const newHue = parseHSL(newColor);
+
+    // Merge hue by averaging
+    const mergedHSL = {
+        hue: (existingHue + newHue) / 2,
+        saturation: SATURATION,
+        lightness: LIGHTNESS,
+    };
+
+    return `hsl(${Math.round(mergedHSL.hue)}, ${Math.round(mergedHSL.saturation)}%, ${Math.round(mergedHSL.lightness)}%)`;
+}
+
+function parseHSL(hsl: string): number {
+    const regex = /hsl\(\s*(\d+)\s*,/; // Only capture the hue
+    const match = hsl.match(regex);
+    if (!match) {
+        throw new Error('Invalid HSL color format');
+    }
+
+    return Number(match[1]); // Return only the hue value
 }
 
 export default useMusicStore;
