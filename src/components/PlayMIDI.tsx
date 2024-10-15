@@ -26,8 +26,8 @@ const PlayPauseButton: React.FC = () => {
     const scheduleNotes = useCallback(() => {
         if (!selectedOutput) return;
 
-        grids.forEach((grid, gridIndex) => {
-            const currentBeatIndex: number = currentBeat.current % (grid.numColumns || 1); // Use currentBeat from useRef
+        grids.forEach((grid) => {
+            const currentBeatIndex: number = currentBeat.current % (grid.numColumns || 1);
             const beat = grid.beats[currentBeatIndex]; // Access the current beat from the grid
 
             if (beat) {
