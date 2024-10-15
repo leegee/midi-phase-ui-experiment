@@ -20,7 +20,7 @@ body {
 
   --midi-app-grid-cell-size: 20pt; 
   --midi-app-grid-bg: lightgray; 
-  --midi-app-grid-border-clr: black;
+  --midi-app-grid-border-clr: #555;
   --selected-background: lightblue;
   --midi-app-grid-current-beat-background: lightgreen;
   --midi-app-grid-current-beat-selected-background: green;

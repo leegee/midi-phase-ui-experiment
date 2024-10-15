@@ -1,7 +1,12 @@
 /* BPMInput.css */
 
+.bpm-selector-component {
+    border: var(--midi-app-container-border);
+}
 .bpm-input {
     width: 4em;
     text-align: right;
     margin-left: var(--midi-app-input-margin-left);
+    margin-right: 1em;
+    border: 0;
 }

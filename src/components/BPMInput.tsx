@@ -21,7 +21,7 @@ const BPMInput: React.FC = () => {
     };
 
     return (
-        <section className='padded-container'>
+        <section className='padded-container bpm-selector-component'>
             <label>
                 BPM:
                 <input
