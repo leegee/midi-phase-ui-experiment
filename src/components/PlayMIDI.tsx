@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useKeydown } from '../hooks/useKeydown';
+
 import { dispatchCurrentBeatEvent } from '../events/eventDispatcher';
 import useStore from '../store';
 
@@ -13,6 +15,13 @@ const PlayPauseButton: React.FC = () => {
     const audioContextRef = useRef<AudioContext | null>(null);
     const intervalRef = useRef<number | null>(null);  // New: intervalRef to store active interval
     const intervalDuration = (60 / bpm) * 1000; // Convert to milliseconds
+
+    useKeydown('Space', () => {
+        setIsPlaying((prev) => !prev);
+        if (!isPlaying) {
+            currentBeat.current = 0;
+        }
+    });
 
     const scheduleNotes = useCallback(() => {
         if (!selectedOutput) return;
@@ -33,7 +42,6 @@ const PlayPauseButton: React.FC = () => {
         });
 
         dispatchCurrentBeatEvent(currentBeat.current);
-        console.debug('tick', currentBeat);
 
         currentBeat.current = currentBeat.current + 1;
     }, [grids, selectedOutput, outputChannel, intervalDuration]);
