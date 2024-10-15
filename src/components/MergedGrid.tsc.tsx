@@ -64,9 +64,9 @@ const MergedGrid: React.FC = () => {
             merged.push(mergeBeats(grids, i));
         }
 
-        // setMergedBeats(merged);
         setMergedBeatsState(merged);
         setMergedBeats(merged);
+
     }, [grids, setMergedBeats]);
 
     return (

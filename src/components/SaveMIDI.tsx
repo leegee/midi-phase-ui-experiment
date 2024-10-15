@@ -1,51 +1,60 @@
 import React from 'react';
-import { File, type MidiChannel, Track } from 'jsmidgen';
+import { Midi } from '@tonejs/midi'; // Importing the Midi class from @tonejs/midi
 import useMusicStore from '../store';
 import { BASE_PITCH } from './PlayMIDI';
 
-function createDataUrlFromBytes(bytes: string, mimeType: string): string {
-    // Convert the binary string to a Uint8Array
-    const uint8Array = new Uint8Array(bytes.length);
-    for (let i = 0; i < bytes.length; i++) {
-        uint8Array[i] = bytes.charCodeAt(i);
-    }
-
-    const base64String = btoa(String.fromCharCode(...uint8Array));
-
-    return `data:${mimeType};base64,${base64String}`;
-}
-
-
 const SaveMIDIButton: React.FC = () => {
-    const { mergedBeats, outputChannel } = useMusicStore();
+    const { bpm, mergedBeats, outputChannel } = useMusicStore();
 
     const saveAsMIDI = () => {
-        const midiFile = new File();
-        const track = new Track();
-        midiFile.addTrack(track);
+        if (mergedBeats.length === 0) {
+            alert("No notes to save!");
+            return;
+        }
+
+        const midiFile = new Midi();
+        midiFile.header.setTempo(bpm);
+        const track = midiFile.addTrack();
+
+        let currentBeat = 0;
 
         mergedBeats.forEach((beat) => {
-            Object.entries(beat.notes).forEach(([pitch, note]) => {
-                const midiPitch = pitch + BASE_PITCH;
-                track.addNote(outputChannel as MidiChannel, midiPitch, note.velocity || 100);
+            const notes = Object.entries(beat.notes);
+
+            notes.forEach(([pitch, note]) => {
+                const midiPitch = Number(pitch) + BASE_PITCH;
+                track.addNote({
+                    midi: midiPitch,
+                    time: currentBeat,
+                    duration: 1,
+                    velocity: note.velocity || 100,
+                });
             });
+
+            currentBeat++;
         });
 
-        const midiBytes = midiFile.toBytes() as unknown as string; // Lib type defs are incorrect
+        const midiBytes = midiFile.toArray();
         const mimeType = 'audio/midi';
         const url = createDataUrlFromBytes(midiBytes, mimeType);
 
         // Create a link to download the MIDI file
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'phase-experiment.mid';
+        link.download = 'phase-experiment.mid'; // Set the file name
         document.body.appendChild(link);
-        link.click();
+        link.click(); // Trigger the download
 
         // Clean up
         document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url); // Revoke the URL to free up memory
     };
+
+    // Helper function to create a data URL from byte array
+    function createDataUrlFromBytes(bytes: Uint8Array, mimeType: string): string {
+        const base64String = btoa(String.fromCharCode(...bytes)); // Convert bytes to base64 string
+        return `data:${mimeType};base64,${base64String}`; // Return the data URL
+    }
 
     return (
         <button onClick={saveAsMIDI}>
