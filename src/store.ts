@@ -10,9 +10,13 @@ export interface Beat {
     notes: Record<number, GridNote>; // Dictionary indexed by pitch
 }
 
+export interface MergedBeat {
+    notes: Record<number, GridNote>; // Merged notes indexed by pitch
+}
+
 export interface Grid {
-    beats: Beat[];     // An array of beats, each containing an object of notes indexed by pitch
-    numColumns: number; // Represents the number of beats (columns)
+    beats: Beat[];
+    numColumns: number;
 }
 
 interface MusicState {
@@ -24,6 +28,8 @@ interface MusicState {
     setNumColumns: (gridIndex: number, numColumns: number) => void;
     updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) => void;
     setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) => void;
+    mergedBeats: MergedBeat[];
+    setMergedBeats: (merged: MergedBeat[]) => void;
 
     inputChannels: number[];
     setInputChannels: (channels: number[]) => void;
@@ -128,6 +134,9 @@ const useMusicStore = create<MusicState>((set) => ({
             return { grids: updatedGrids };
         });
     },
+
+    mergedBeats: [],
+    setMergedBeats: (merged) => set({ mergedBeats: merged }),
 
     inputChannels: Array.from({ length: 16 }, (_, index) => index),
     setInputChannels: (channels) => set({ inputChannels: channels }),

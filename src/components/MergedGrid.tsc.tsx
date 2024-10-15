@@ -48,7 +48,9 @@ const mergeBeats = (grids: Grid[], beatIndex: number): MergedBeat => {
 const MergedGrid: React.FC = () => {
     const gridRef = useRef<HTMLDivElement | null>(null);
     const grids = useMusicStore((state) => state.grids);
-    const [mergedBeats, setMergedBeats] = useState<MergedBeat[]>([]);
+    // const [mergedBeats, setMergedBeats] = useState<MergedBeat[]>([]);
+    const setMergedBeats = useMusicStore((state) => state.setMergedBeats);
+    const [mergedBeats, setMergedBeatsState] = useState<MergedBeat[]>([]);
 
     useEffect(() => {
         if (grids.length === 0) return;
@@ -62,8 +64,10 @@ const MergedGrid: React.FC = () => {
             merged.push(mergeBeats(grids, i));
         }
 
+        // setMergedBeats(merged);
+        setMergedBeatsState(merged);
         setMergedBeats(merged);
-    }, [grids]);
+    }, [grids, setMergedBeats]);
 
     return (
         <section className="grid-component" ref={gridRef}>
