@@ -1,9 +1,10 @@
 import React from 'react';
-import { File, Track } from 'jsmidgen';
+import { File, type MidiChannel, Track } from 'jsmidgen';
 import useMusicStore from '../store';
 import { BASE_PITCH } from './PlayMIDI';
 
 function createDataUrlFromBytes(bytes: string, mimeType: string): string {
+    // Convert the binary string to a Uint8Array
     const uint8Array = new Uint8Array(bytes.length);
     for (let i = 0; i < bytes.length; i++) {
         uint8Array[i] = bytes.charCodeAt(i);
@@ -16,7 +17,7 @@ function createDataUrlFromBytes(bytes: string, mimeType: string): string {
 
 
 const SaveMIDIButton: React.FC = () => {
-    const { mergedBeats } = useMusicStore();
+    const { mergedBeats, outputChannel } = useMusicStore();
 
     const saveAsMIDI = () => {
         const midiFile = new File();
@@ -26,7 +27,7 @@ const SaveMIDIButton: React.FC = () => {
         mergedBeats.forEach((beat) => {
             Object.entries(beat.notes).forEach(([pitch, note]) => {
                 const midiPitch = pitch + BASE_PITCH;
-                track.addNote(0, midiPitch, note.velocity || 100);
+                track.addNote(outputChannel as MidiChannel, midiPitch, note.velocity || 100);
             });
         });
 
