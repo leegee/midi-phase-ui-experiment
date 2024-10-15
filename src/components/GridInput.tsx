@@ -29,13 +29,11 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             if (isCtrlPressed) {
                 // Adjust velocity if CTRL is pressed
                 existingNote.velocity = velocity;
-                // Update note velocity in the store
                 updateNoteVelocity(gridIndex, beatIndex, pitch, velocity);
                 dispatchPlayNoteNowEvent(pitch, velocity);
             } else {
                 // Remove the note if it exists and CTRL is not pressed
                 delete notes[pitch];
-                console.log('toggleNote remove note from ', gridIndex, 'beat', beatIndex, pitch);
                 setOrUpdateNoteInGrid(gridIndex, beatIndex, { pitch, velocity: 0 }); // Use a default velocity if needed
             }
         } else {
@@ -44,9 +42,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             setOrUpdateNoteInGrid(gridIndex, beatIndex, newNote);
             dispatchPlayNoteNowEvent(pitch, velocity);
         }
-
-        // setGrid(gridIndex, grid);
-    }, [isCtrlPressed, gridIndex, setOrUpdateNoteInGrid, updateNoteVelocity]);
+    }, [isCtrlPressed, gridIndex, setOrUpdateNoteInGrid, updateNoteVelocity, grids]);
 
 
     const handleMouseDown = (pitch: number, e: React.MouseEvent<HTMLDivElement>) => {
