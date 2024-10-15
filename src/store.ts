@@ -32,7 +32,7 @@ interface MusicState {
     updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) => void;
     setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) => void;
     mergedBeats: MergedBeat[];
-    setMergedBeats: (merged: MergedBeat[]) => void;
+    mergeGrids: () => void;
 
     inputChannels: number[];
     setInputChannels: (channels: number[]) => void;
@@ -126,20 +126,17 @@ const useMusicStore = create<MusicState>((set) => ({
             }
             return { grids: newGrids };
         }),
+
     setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) =>
         set((state) => {
             const newGrids = [...state.grids];
             const selectedGrid = newGrids[gridIndex];
 
-            console.log('setOrUpdateNoteInGrid grid', gridIndex, 'beatIndex', beatIndex, 'pitch', note.pitch, 'note', note)
-
             if (note.velocity === 0) {
                 delete selectedGrid.beats[beatIndex].notes[note.pitch];
-                console.log('setOrUpdateNoteInGrid deleted grid/beatIndex', gridIndex, '/', beatIndex, 'pitch', note.pitch);
             }
             else {
                 // Ensure the beat exists
-                console.log('setOrUpdateNoteInGrid added to grid ', gridIndex, 'beatIndex', beatIndex, 'pitch', note.pitch, 'note', note)
                 if (!selectedGrid.beats[beatIndex]) {
                     selectedGrid.beats[beatIndex] = { notes: {} };
                 }
@@ -160,7 +157,20 @@ const useMusicStore = create<MusicState>((set) => ({
     },
 
     mergedBeats: [],
-    setMergedBeats: (merged) => set({ mergedBeats: merged }),
+    mergeGrids: () => set((state) => {
+        const { grids } = state;
+
+        if (grids.length === 0) return { mergedBeats: [] };
+
+        const lcmBeats = grids.reduce((acc, grid) => lcm(acc, grid.numColumns), grids[0].numColumns);
+
+        const merged: MergedBeat[] = [];
+        for (let i = 0; i < lcmBeats; i++) {
+            merged.push(mergeBeats(grids, i));
+        }
+
+        return { mergedBeats: merged };
+    }),
 
     inputChannels: Array.from({ length: 16 }, (_, index) => index),
     setInputChannels: (channels) => set({ inputChannels: channels }),
@@ -168,5 +178,35 @@ const useMusicStore = create<MusicState>((set) => ({
     outputChannel: 1,
     setOutputChannel: (channel) => set({ outputChannel: channel }),
 }));
+
+
+const gcd = (a: number, b: number): number => {
+    return b === 0 ? a : gcd(b, a % b);
+};
+
+const lcm = (a: number, b: number): number => {
+    return (a * b) / gcd(a, b);
+};
+
+// Function to merge notes from multiple grids for a given beat index
+const mergeBeats = (grids: Grid[], beatIndex: number): MergedBeat => {
+    const mergedNotes: Record<number, GridNote> = {};
+
+    grids.forEach((grid) => {
+        const extendedBeatIndex = beatIndex % grid.numColumns;
+        const beat = grid.beats[extendedBeatIndex];
+
+        if (beat) {
+            Object.entries(beat.notes).forEach(([pitch, note]) => {
+                const numericPitch = Number(pitch);
+                if (!mergedNotes[numericPitch]) {
+                    mergedNotes[numericPitch] = note;
+                }
+            });
+        }
+    });
+
+    return { notes: mergedNotes };
+};
 
 export default useMusicStore;
