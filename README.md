@@ -1,12 +1,10 @@
 # MIDI Phase Rhythms UI
 
-A React UI to experiment with real-time phasing of MIDI rhythms
+A React UI to experiment with real-time phasing of MIDI rhythms and first use of zustand.
 
 # To Do
 
 * Set cell units
-
-* Display the step input button somewhere sensibel
 
 *  MIDI CLock Sync
 
