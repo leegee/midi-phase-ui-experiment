@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.87d2935f.css",
-    "main.js": "/static/js/main.162bdc68.js",
-    "static/js/453.c0425681.chunk.js": "/static/js/453.c0425681.chunk.js",
-    "index.html": "/index.html",
-    "main.87d2935f.css.map": "/static/css/main.87d2935f.css.map",
-    "main.162bdc68.js.map": "/static/js/main.162bdc68.js.map",
-    "453.c0425681.chunk.js.map": "/static/js/453.c0425681.chunk.js.map"
+    "main.css": "/midi-phase-ui-experiment/static/css/main.87d2935f.css",
+    "main.js": "/midi-phase-ui-experiment/static/js/main.58af7569.js",
+    "static/js/453.c0425681.chunk.js": "/midi-phase-ui-experiment/static/js/453.c0425681.chunk.js",
+    "index.html": "/midi-phase-ui-experiment/index.html",
+    "main.87d2935f.css.map": "/midi-phase-ui-experiment/static/css/main.87d2935f.css.map",
+    "main.58af7569.js.map": "/midi-phase-ui-experiment/static/js/main.58af7569.js.map",
+    "453.c0425681.chunk.js.map": "/midi-phase-ui-experiment/static/js/453.c0425681.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.87d2935f.css",
-    "static/js/main.162bdc68.js"
+    "static/js/main.58af7569.js"
   ]
 }
