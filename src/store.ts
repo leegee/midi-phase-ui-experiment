@@ -27,6 +27,7 @@ interface MusicState {
     setGrid: (gridIndex: number, grid: Grid) => void;
     clearGrid: (gridIndex: number) => void;
     addGrid: (insertAfterIndex: number) => void;
+    removeGrid: (gridIndex: number) => void;
     setNumColumns: (gridIndex: number, numColumns: number) => void;
     updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) => void;
     setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) => void;
@@ -115,6 +116,14 @@ const useMusicStore = create<MusicState>((set) => ({
         set((state) => {
             const newGrids = [...state.grids];
             newGrids.splice(insertAfterIndex + 1, 0, { beats: [], numColumns: 4 });
+            return { grids: newGrids };
+        }),
+    removeGrid: (gridIndex: number) =>
+        set((state) => {
+            const newGrids = [...state.grids];
+            if (gridIndex >= 0 && gridIndex < newGrids.length) {
+                newGrids.splice(gridIndex, 1);
+            }
             return { grids: newGrids };
         }),
     setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) =>

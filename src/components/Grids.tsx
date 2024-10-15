@@ -8,6 +8,7 @@ import StepInput from './StepInput';
 import MergedGrid from './MergedGrid.tsc';
 import ClearGridButton from './ClearGridButton';
 import AddGridButton from './AddGridButton';
+import RemoveGridButton from './RemoveGridButton';
 
 const Grids: React.FC = () => {
     const { grids } = useMusicStore();
@@ -26,6 +27,7 @@ const Grids: React.FC = () => {
                             <StepInput gridIndex={gridIndex} />
                             <ClearGridButton gridIndex={gridIndex} />
                             <AddGridButton gridIndex={gridIndex} />
+                            <RemoveGridButton gridIndex={gridIndex} />
                         </div>
                     </React.Fragment>
                 ))}
