@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+
 import './GridInput.css';
 import useMusicStore, { type GridNote, Grid } from '../store';
+import { dispatchPlayNoteNowEvent } from '../events/dispatchPlayNoteNowEvent';
 
 const GRID_PITCH_RANGE = 88;
 
@@ -31,6 +33,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                 existingNote.velocity = velocity;
                 // Update note velocity in the store
                 updateNoteVelocity(gridIndex, beatIndex, pitch, velocity);
+                dispatchPlayNoteNowEvent(pitch, velocity);
             } else {
                 // Remove the note if it exists and CTRL is not pressed
                 delete notes[pitch];
@@ -41,6 +44,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             // Add a new note if it does not exist
             const newNote: GridNote = { pitch, velocity };
             setOrUpdateNoteInGrid(gridIndex, beatIndex, newNote);
+            dispatchPlayNoteNowEvent(pitch, velocity);
         }
 
         // setGrid(gridIndex, grid);
@@ -59,7 +63,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             const note = grid.beats[beatIndex]?.notes[pitch];
 
             // Set dragging note to the existing note or create a new one
-            setDraggingNote(note || { pitch, velocity: 100 }); // No startTime in the new store
+            setDraggingNote(note || { pitch, velocity: 75 });
         }
         else {
             toggleNote(pitch, beatIndex); // Call toggleNote with the updated signature

@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 
 import './StepInput.css';
-import { dispatchCurrentBeatEvent } from '../events/eventDispatcher';
+import { dispatchCurrentBeatEvent } from '../events/dispatchCurrentBeatEvent';
 import useMusicStore, { GridNote } from '../store';
 import { BASE_PITCH } from './PlayMIDI';
 

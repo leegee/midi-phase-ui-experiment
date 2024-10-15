@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useKeydown } from '../hooks/useKeydown';
 
-import { dispatchCurrentBeatEvent } from '../events/eventDispatcher';
+import { dispatchCurrentBeatEvent } from '../events/dispatchCurrentBeatEvent';
+import { PLAY_NOTE_NOW_EVENT_NAME, type PlayNoteNowDetail } from '../events/dispatchPlayNoteNowEvent';
+
 import useStore from '../store';
 
 export const BASE_PITCH = 21;
@@ -23,6 +25,14 @@ const PlayPauseButton: React.FC = () => {
         }
     });
 
+    const playNoteNow = useCallback((pitch: number, velocity = 75) => {
+        if (!selectedOutput) return;
+        const noteOnTime = window.performance.now();
+        const noteOffTime = noteOnTime + intervalDuration;
+        selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + pitch, velocity], noteOnTime);
+        selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + pitch, 0], noteOffTime);
+    }, [intervalDuration, outputChannel, selectedOutput]);
+
     const scheduleNotes = useCallback(() => {
         if (!selectedOutput) return;
 
@@ -32,11 +42,7 @@ const PlayPauseButton: React.FC = () => {
 
             if (beat) {
                 Object.values(beat.notes).forEach(noteToPlay => {
-                    const noteOnTime = window.performance.now();
-                    const noteOffTime = noteOnTime + intervalDuration;
-
-                    selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + noteToPlay.pitch, noteToPlay.velocity || 100], noteOnTime);
-                    selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + noteToPlay.pitch, 0], noteOffTime);
+                    playNoteNow(noteToPlay.pitch, noteToPlay.velocity);
                 });
             }
         });
@@ -44,7 +50,7 @@ const PlayPauseButton: React.FC = () => {
         dispatchCurrentBeatEvent(currentBeat.current);
 
         currentBeat.current = currentBeat.current + 1;
-    }, [grids, selectedOutput, outputChannel, intervalDuration]);
+    }, [selectedOutput, grids, playNoteNow]);
 
     const startPlayback = useCallback(() => {
         if (!audioContextRef.current) {
@@ -82,6 +88,17 @@ const PlayPauseButton: React.FC = () => {
             currentBeat.current = 0;
         }
     };
+
+    useEffect(() => {
+        const handlePlayNote = (event: CustomEvent<PlayNoteNowDetail>) => {
+            const { pitch, velocity } = event.detail;
+            playNoteNow(pitch, velocity);
+        };
+
+        window.addEventListener(PLAY_NOTE_NOW_EVENT_NAME, handlePlayNote as EventListener);
+
+        return () => window.removeEventListener(PLAY_NOTE_NOW_EVENT_NAME, handlePlayNote as EventListener);
+    }, [playNoteNow]);
 
     return (
         <section className='padded-container'>
