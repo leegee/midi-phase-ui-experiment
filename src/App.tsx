@@ -7,6 +7,7 @@ import useMIDI from './hooks/useMIDI';
 import DeviceSelector from './components/DeviceSelector';
 import PlayPauseButton from './components/PlayMIDI';
 import Grids from './components/Grids';
+import MergedGrid from './components/MergedGrid.tsc';
 
 const App: React.FC = () => {
   const { error, selectedInput, selectedOutput } = useMIDI();
@@ -43,6 +44,8 @@ const App: React.FC = () => {
         </section>
 
         <Grids />
+
+        <MergedGrid />
 
       </>
       }
