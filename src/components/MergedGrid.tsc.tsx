@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import useMusicStore, { Grid, GridNote, Beat } from '../store';
+import React, { useEffect, useRef, useState } from 'react';
+
+import './GridInput.css';
+import useMusicStore, { type Grid, type GridNote } from '../store';
+
+const GRID_PITCH_RANGE = 88;
 
 interface MergedBeat {
     notes: Record<number, GridNote>; // Merged notes indexed by pitch
 }
+
+const calculateOpacity = (velocity: number) => {
+    return velocity / 127; // Normalize velocity to opacity range [0, 1]
+};
 
 // Helper function to merge notes from multiple grids for a given beat index
 const mergeBeats = (grids: Grid[], beatIndex: number): MergedBeat => {
@@ -26,6 +34,7 @@ const mergeBeats = (grids: Grid[], beatIndex: number): MergedBeat => {
 };
 
 const MergedGrid: React.FC = () => {
+    const gridRef = useRef<HTMLDivElement | null>(null);
     const grids = useMusicStore((state) => state.grids);
     const [mergedBeats, setMergedBeats] = useState<MergedBeat[]>([]);
 
@@ -43,26 +52,23 @@ const MergedGrid: React.FC = () => {
     }, [grids]);
 
     return (
-        <div>
-            <h2>Merged Notes </h2>
-            <ul>
-                {
-                    mergedBeats.map((beat, beatIndex) => (
-                        <li key={beatIndex} >
-                            <strong>Beat {beatIndex + 1}: </strong>
-                            <ul>
-                                {
-                                    Object.entries(beat.notes).map(([pitch, note]) => (
-                                        <li key={pitch} >
-                                            Pitch: {pitch}, Velocity: {note.velocity}
-                                        </li>
-                                    ))
-                                }
-                            </ul>
-                        </li >
-                    ))}
-            </ul>
-        </div>
+        <section className="grid-component" ref={gridRef}>
+            {mergedBeats.map((beat, beatIndex) => (
+                <div key={`column-${beatIndex}`} className="grid-column">
+                    {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
+                        const note = beat.notes[pitch]; // Access the note for the current pitch
+
+                        return (
+                            <div
+                                key={`cell-${beatIndex}-${pitch}`}
+                                className={`grid-cell ${note ? 'active' : ''}`}
+                                style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
+                            />
+                        );
+                    })}
+                </div>
+            ))}
+        </section>
     );
 };
 
