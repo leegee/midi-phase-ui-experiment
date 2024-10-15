@@ -79,9 +79,11 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
     };
 
     return (
-        <button className='step-input-button' onClick={toggleStepInputMode}>
-            {currentBeatRef.current > 0 ? 'Stop' : 'Step Input'}
-        </button>
+        <button className='step-input-button' onClick={toggleStepInputMode}
+            title={currentBeatRef.current > 0 ? 'Exit step input mode' : 'Enter step input mode'}
+        >
+            {currentBeatRef.current > 0 ? 'Exit' : 'Step'}
+        </button >
     );
 };
 

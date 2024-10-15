@@ -15,10 +15,14 @@ const Grids: React.FC = () => {
                 <PianoLegend />
 
                 {Array.from({ length: grids.length }).map((_, gridIndex) => (
-                    <div className="grid-wrapper" key={gridIndex}>
-                        <GridInput gridIndex={gridIndex} />
-                        <StepInput gridIndex={gridIndex} />
-                    </div>
+                    <>
+                        <div className="grid-wrapper" key={gridIndex}>
+                            <GridInput gridIndex={gridIndex} />
+                        </div>
+                        <div className="ctrls-wrapper" key={gridIndex}>
+                            <StepInput gridIndex={gridIndex} />
+                        </div>
+                    </>
                 ))}
             </section>
 

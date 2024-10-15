@@ -19,7 +19,8 @@
   flex-direction: column; 
 }
 
-.column {
-    display: block;
-    float: left;
+.ctrls-wrapper {
+  position: sticky;
+  top: 0;
 }
+
