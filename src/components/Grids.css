@@ -26,6 +26,7 @@
   flex-direction: column;
 }
 
-.ctrls-wrapper > *{
+.ctrls-wrapper button {
   margin-bottom: 1em;
+  width: 100%;
 }
