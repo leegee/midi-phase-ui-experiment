@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './GridInput.css';
-import useMusicStore, { GridNote, Grid } from '../store';
+import useMusicStore, { type GridNote, type Grid } from '../store';
 
 const GRID_PITCH_RANGE = 88;
 
