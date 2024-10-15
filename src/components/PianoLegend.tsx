@@ -22,7 +22,7 @@ const PianoLegend: React.FC = () => {
     const notes = getPianoNotes();
 
     return (
-        <div className="piano-legend">
+        <section className="piano-legend">
             {notes.map((note, index) => (
                 <div
                     key={index}
@@ -31,7 +31,7 @@ const PianoLegend: React.FC = () => {
                     {note.name}
                 </div>
             ))}
-        </div>
+        </section>
     );
 };
 
