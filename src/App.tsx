@@ -45,7 +45,9 @@ const App: React.FC = () => {
       {!error && selectedInput && selectedOutput && <>
 
         <section className='app-toolbar'>
-          <h1>MIDI Phase  Editor</h1>
+          <header>
+            <h1>MIDI Phase  Editor</h1>
+          </header>
           <PlayPauseButton />
           <BPMInput />
           <SaveMIDI />

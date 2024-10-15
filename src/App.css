@@ -9,10 +9,16 @@ main {
   align-items: center;
   border: var(--midi-app-container-border);
   height: var(--midi-app-toolbar-height);
-  max-height: var(--midi-app-toolbar-height);
+  max-height: calc( var(--midi-app-toolbar-height) - 1rem);
+  margin-bottom: 1rem;
 }
 
-.app-toolbar h1 {
+header, h1 {
+  margin: 0;
+  padding: 0;
+}
+
+ h1 {
   font-size: 1.5rem;
   opacity: 50%;
   margin-right: auto;
