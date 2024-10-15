@@ -1,7 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-
 import './GridInput.css';
 import useMusicStore, { type Grid, type GridNote } from '../store';
+
+// Function to calculate the greatest common divisor (GCD)
+const gcd = (a: number, b: number): number => {
+    return b === 0 ? a : gcd(b, a % b);
+};
+
+// Function to calculate the least common multiple (LCM)
+const lcm = (a: number, b: number): number => {
+    return (a * b) / gcd(a, b);
+};
 
 const GRID_PITCH_RANGE = 88;
 
@@ -18,7 +27,10 @@ const mergeBeats = (grids: Grid[], beatIndex: number): MergedBeat => {
     const mergedNotes: Record<number, GridNote> = {};
 
     grids.forEach((grid) => {
-        const beat = grid.beats[beatIndex];
+        // Extend grid pattern by repeating its beats based on its size
+        const extendedBeatIndex = beatIndex % grid.numColumns;
+        const beat = grid.beats[extendedBeatIndex];
+
         if (beat) {
             Object.entries(beat.notes).forEach(([pitch, note]) => {
                 const numericPitch = Number(pitch);
@@ -39,12 +51,14 @@ const MergedGrid: React.FC = () => {
     const [mergedBeats, setMergedBeats] = useState<MergedBeat[]>([]);
 
     useEffect(() => {
-        // Find the maximum number of columns (beats) across all grids
-        const maxBeats = Math.max(...grids.map((grid) => grid.numColumns));
+        if (grids.length === 0) return;
 
-        // Merge the notes for each beat
+        // Calculate LCM of number of columns (beats) across all grids
+        const lcmBeats = grids.reduce((acc, grid) => lcm(acc, grid.numColumns), grids[0].numColumns);
+
+        // Merge the notes for each beat across the extended LCM range
         const merged: MergedBeat[] = [];
-        for (let i = 0; i < maxBeats; i++) {
+        for (let i = 0; i < lcmBeats; i++) {
             merged.push(mergeBeats(grids, i));
         }
 
