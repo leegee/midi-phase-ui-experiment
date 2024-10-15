@@ -143,6 +143,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                     notes: index < newNumColumns ? beat.notes : {},
                 })),
                 numColumns: newNumColumns,
+                colour: grid.colour,
             });
 
             setGrid(gridIndex, updatedGrid);
@@ -172,8 +173,11 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                                 ref={el => (cellRefs.current[reversedPitchIndex][beat] = el)}
                                 onMouseDown={(e) => handleMouseDown(reversedPitchIndex, e)} // Handle using the reversed index
                                 className={`grid-cell ${note ? 'active' : ''}`}
-                                style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
                                 data-beat={beat} // Store beat index in data attribute for now, move to column later
+                                style={{
+                                    opacity: note ? calculateOpacity(note.velocity) : 1,
+                                    ...(note ? { backgroundColor: grid.colour } : {}),
+                                }}
                             />
                         );
                     })}

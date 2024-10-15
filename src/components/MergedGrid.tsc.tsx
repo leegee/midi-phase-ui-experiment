@@ -25,12 +25,14 @@ const MergedGrid: React.FC = () => {
                     {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
                         const reversedPitchIndex = GRID_PITCH_RANGE - 1 - pitch; // Reverse the pitch index
                         const note = beat.notes[reversedPitchIndex]; // Use reversed pitch index
-
                         return (
                             <div
                                 key={`cell-${beatIndex}-${reversedPitchIndex}`} // Use reversed pitch index for key
                                 className={`grid-cell ${note ? 'active' : ''}`}
-                                style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
+                                style={{
+                                    opacity: note ? calculateOpacity(note.velocity) : 1,
+                                    ...(note ? { backgroundColor: note.colour } : {}),
+                                }}
                             />
                         );
                     })}

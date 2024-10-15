@@ -6,29 +6,37 @@ export interface GridNote {
     velocity: number;
 }
 
+export interface GridNoteMerged {
+    pitch: number;
+    velocity: number;
+    colour: string;
+}
+
 export interface Beat {
     notes: Record<number, GridNote>; // Dictionary indexed by pitch
 }
 
 export interface MergedBeat {
-    notes: Record<number, GridNote>; // Merged notes indexed by pitch
+    notes: Record<number, GridNoteMerged>; // Merged notes indexed by pitch
 }
 
 export class Grid {
     beats: Beat[];
     numColumns: number;
+    colour: string;
 
-    constructor(numColumns: number);
+    constructor(numColumns: number, colour: string);
+    constructor(params: { beats: { notes: Record<number, GridNote> }[]; numColumns: number; colour: string });
 
-    constructor(params: { beats: { notes: Record<number, GridNote> }[]; numColumns: number });
-
-    constructor(arg: number | { beats: { notes: Record<number, GridNote> }[]; numColumns: number }) {
+    constructor(arg: number | { beats: { notes: Record<number, GridNote> }[]; numColumns: number; colour: string }, colour?: string) {
         if (typeof arg === 'number') {
             this.numColumns = arg;
             this.beats = Array.from({ length: arg }, () => ({ notes: {} }));
+            this.colour = colour || 'blue';
         } else {
             this.numColumns = arg.numColumns;
             this.beats = arg.beats;
+            this.colour = arg.colour;
         }
     }
 
@@ -66,17 +74,18 @@ export class Grid {
 }
 
 export class MergedBeat {
-    notes: Record<number, GridNote>;
+    notes: Record<number, GridNoteMerged>;
 
     constructor() {
         this.notes = {};
     }
 
-    mergeWith(beat: Beat) {
+    mergeWithGridBeat(grid: Grid, beatIndex: number) {
+        const beat = grid.beats[beatIndex];
         Object.entries(beat.notes).forEach(([pitch, note]) => {
             const numericPitch = Number(pitch);
             if (!this.notes[numericPitch]) {
-                this.notes[numericPitch] = note;
+                this.notes[numericPitch] = { ...note, colour: grid.colour };
             }
         });
     }
@@ -131,8 +140,8 @@ const useMusicStore = create<MusicState>((set) => ({
     setBPM: (newBPM: number) => set({ bpm: newBPM }),
 
     grids: [
-        new Grid(3),
-        new Grid(4),
+        new Grid(3, colours(1, 2)),
+        new Grid(4, colours(2, 2)),
     ],
     setGrid: (gridIndex: number, grid: Grid) =>
         set((state) => {
@@ -148,10 +157,14 @@ const useMusicStore = create<MusicState>((set) => ({
             }
             return { grids: newGrids };
         }),
-    addGrid: (insertAfterIndex: number) =>
+    // Insert a new grid after the specified index
+    addGrid: (insertAfterIndex: number, numColumns: number = 4) =>
         set((state) => {
             const newGrids = [...state.grids];
-            newGrids.splice(insertAfterIndex + 1, 0, new Grid(4));
+            newGrids.splice(insertAfterIndex + 1, 0, new Grid(numColumns, 'red'));
+            newGrids.forEach((grid, index) => {
+                grid.colour = colours(index, newGrids.length);
+            });
             return { grids: newGrids };
         }),
     removeGrid: (gridIndex: number) =>
@@ -201,7 +214,7 @@ const useMusicStore = create<MusicState>((set) => ({
                 const extendedBeatIndex = i % grid.numColumns;
                 const beat = grid.beats[extendedBeatIndex];
                 if (beat) {
-                    mergedBeat.mergeWith(beat);
+                    mergedBeat.mergeWithGridBeat(grid, extendedBeatIndex);
                 }
             });
             merged.push(mergedBeat);
@@ -224,5 +237,10 @@ const gcd = (a: number, b: number): number => {
 const lcm = (a: number, b: number): number => {
     return (a * b) / gcd(a, b);
 };
+
+function colours(index: number, total: number): string {
+    const hue = (index / total) * 360; // Calculate hue based on index
+    return `hsl(${hue}, 100%, 50%)`;
+}
 
 export default useMusicStore;
