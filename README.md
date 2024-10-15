@@ -2,6 +2,8 @@
 
 A React UI to experiment with real-time phasing of MIDI rhythms and first use of zustand.
 
+[Demo](https://leegee.github.io/midi-phase-ui-experiment/)
+
 # To Do
 
 * Set cell units
