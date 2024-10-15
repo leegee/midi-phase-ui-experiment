@@ -46,8 +46,8 @@ const App: React.FC = () => {
 
         <section className='app-toolbar'>
           <h1>MIDI Phase  Editor</h1>
-          <BPMInput />
           <PlayPauseButton />
+          <BPMInput />
           <SaveMIDI />
           <DeviceSelector />
         </section>

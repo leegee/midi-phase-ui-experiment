@@ -57,7 +57,7 @@ const SaveMIDIButton: React.FC = () => {
     }
 
     return (
-        <button onClick={saveAsMIDI}>
+        <button onClick={saveAsMIDI} title='Save a .mid file'>
             Export MIDI
         </button>
     );
