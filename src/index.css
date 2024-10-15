@@ -24,6 +24,7 @@ body {
   --selected-background: lightblue;
   --midi-app-grid-current-beat-background: lightgreen;
   --midi-app-grid-current-beat-selected-background: green;
+  --midi-app-toolbar-height: 3rem;
 }
 
 code {

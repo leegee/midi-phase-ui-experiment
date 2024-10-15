@@ -8,10 +8,9 @@
   display: flex;
   flex: 1;
   gap: var(--midi-app-container-padding);
-  height: calc( var(--midi-app-grid-cell-size) * 13);
-  overflow-x: auto;
-  overflow-y: auto;
+  overflow: auto;
   border: 1pt solid var(--midi-app-container-border);
+  height: calc(50vh - (var(--midi-app-toolbar-height) / 2) - 2rem);
 }
 
 .grid-wrapper {

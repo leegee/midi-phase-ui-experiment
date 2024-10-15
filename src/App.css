@@ -8,6 +8,8 @@ main {
   display: flex;
   align-items: center;
   border: var(--midi-app-container-border);
+  height: var(--midi-app-toolbar-height);
+  max-height: var(--midi-app-toolbar-height);
 }
 
 .app-toolbar h1 {
