@@ -50,19 +50,19 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
 
     const handleMouseDown = (pitch: number, e: React.MouseEvent<HTMLDivElement>) => {
         const beatIndex = Number(e.currentTarget.dataset.beat);
-
         if (e.ctrlKey) {
             setIsCtrlPressed(true);
 
             // Access the current grid from the store
-            const grid = useMusicStore.getState().grids[gridIndex];
+            const grid = grids[gridIndex];
 
             // Check if the note exists in the specified beat
             const note = grid.beats[beatIndex]?.notes[pitch];
 
             // Set dragging note to the existing note or create a new one
             setDraggingNote(note || { pitch, velocity: 100 }); // No startTime in the new store
-        } else {
+        }
+        else {
             toggleNote(pitch, beatIndex); // Call toggleNote with the updated signature
         }
     };
@@ -163,15 +163,15 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             {Array.from({ length: grid ? grid.numColumns : 0 }).map((_, beat) => (
                 <div key={`column-${beat}`} className="grid-column">
                     {Array.from({ length: GRID_PITCH_RANGE }).map((_, pitch) => {
-                        // Access the beat directly from the grid.beats array
+                        const reversedPitchIndex = GRID_PITCH_RANGE - 1 - pitch; // Reverse the pitch index
                         const beatData = grid.beats[beat]; // Get the specific beat
-                        const note = beatData ? beatData.notes[pitch] : undefined; // Access notes for that pitch
+                        const note = beatData ? beatData.notes[reversedPitchIndex] : undefined; // Access notes for that reversed pitch
 
                         return (
                             <div
-                                key={`${pitch}-${beat}`}
-                                ref={el => (cellRefs.current[pitch][beat] = el)}
-                                onMouseDown={(e) => handleMouseDown(pitch, e)}
+                                key={`${reversedPitchIndex}-${beat}`} // Use the reversed pitch index
+                                ref={el => (cellRefs.current[reversedPitchIndex][beat] = el)}
+                                onMouseDown={(e) => handleMouseDown(reversedPitchIndex, e)} // Handle using the reversed index
                                 className={`grid-cell ${note ? 'active' : ''}`}
                                 style={{ opacity: note ? calculateOpacity(note.velocity) : 1 }}
                                 data-beat={beat} // Store beat index in data attribute for now, move to column later

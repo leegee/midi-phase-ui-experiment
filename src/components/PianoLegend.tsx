@@ -19,7 +19,7 @@ const PianoLegend: React.FC = () => {
         return notes;
     };
 
-    const notes = getPianoNotes();
+    const notes = getPianoNotes().reverse();
 
     return (
         <section className="piano-legend">
