@@ -7,6 +7,7 @@ import PianoLegend from './PianoLegend';
 import StepInput from './StepInput';
 import MergedGrid from './MergedGrid.tsc';
 import ClearGridButton from './ClearGridButton';
+import AddGridButton from './AddGridButton';
 
 const Grids: React.FC = () => {
     const { grids } = useMusicStore();
@@ -24,6 +25,7 @@ const Grids: React.FC = () => {
                         <div className="ctrls-wrapper" key={'ctrls_' + gridIndex}>
                             <StepInput gridIndex={gridIndex} />
                             <ClearGridButton gridIndex={gridIndex} />
+                            <AddGridButton gridIndex={gridIndex} />
                         </div>
                     </React.Fragment>
                 ))}
