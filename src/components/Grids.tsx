@@ -10,6 +10,7 @@ import ClearGridButton from './ClearGridButton';
 import AddGridButton from './AddGridButton';
 import RemoveGridButton from './RemoveGridButton';
 import DoubleGridSizeButton from './DoubleGridSizeButton';
+import HalveGridSizeButton from './HalveGridSizeButton';
 
 const Grids: React.FC = () => {
     const { grids } = useMusicStore();
@@ -57,6 +58,7 @@ const Grids: React.FC = () => {
                             <ClearGridButton gridIndex={gridIndex} />
                             <AddGridButton gridIndex={gridIndex} />
                             <DoubleGridSizeButton gridIndex={gridIndex} />
+                            <HalveGridSizeButton gridIndex={gridIndex} />
                             <RemoveGridButton gridIndex={gridIndex} />
                         </div>
                     </React.Fragment>

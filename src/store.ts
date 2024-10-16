@@ -88,6 +88,19 @@ export class Grid {
         this.beats = newBeats;
         this.numColumns = newBeats.length;
     }
+
+    // Method to halve the size of the grid, ignoring the final column in grids with an odd number of columns
+    halveSize() {
+        const newBeats: Beat[] = [];
+
+        // Loop through every second beat
+        for (let i = 0; i < this.beats.length; i += 2) {
+            newBeats.push(this.beats[i]);
+        }
+
+        this.beats = newBeats;
+        this.numColumns = newBeats.length;
+    }
 }
 
 export class MergedBeat {
