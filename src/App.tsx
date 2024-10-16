@@ -34,7 +34,7 @@ const App: React.FC = () => {
             Click a grid square to set a note, or use step input.
           </p>
           <p>
-            Drag a grid square up/down whilst holding the CTRL key to change velocity.
+            CTRL-click a grid square to set velocity.
           </p>
           <div>
             <DeviceSelector />
