@@ -22,7 +22,7 @@ const DoubleGridSizeButton: React.FC<DoubleGridSizeButtonProps> = ({ gridIndex }
 
     return (
         <button onClick={handleDoubleGridSize}>
-            Double Grid Size
+            Double
         </button>
     );
 };
