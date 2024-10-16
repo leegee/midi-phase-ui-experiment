@@ -1,4 +1,7 @@
 /* components/StepInput.css */
 
-.step-input-button {
+.active {
+    border-style: solid;
+    background-color: red;
+    color: white;
 }

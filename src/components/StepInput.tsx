@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 import './StepInput.css';
 import { dispatchCurrentBeatEvent } from '../events/dispatchCurrentBeatEvent';
@@ -15,6 +15,7 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
     const { grids, selectedInput, setOrUpdateNoteInGrid, inputChannels } = useMusicStore();
     const grid = grids[gridIndex];
     const currentBeatRef = useRef(0);
+    const [stepInputMode, setStepInputMode] = useState(false); // State for step input mode
 
     const handleMIDIMessage = (event: WebMidi.MIDIMessageEvent) => {
         const [status, note, velocity] = event.data;
@@ -28,13 +29,15 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
         }
     };
 
-    const toggleStepInputMode = () => {
-        if (currentBeatRef.current > 0) {
+    const toggleStepInputMode = (forceStop: boolean = false) => {
+        if (stepInputMode || forceStop) {
             // Reset current beat when exiting step input mode
             currentBeatRef.current = 0;
             stopListening();
+            setStepInputMode(false); // Update state
         } else {
             startListening();
+            setStepInputMode(true); // Update state
         }
     };
 
@@ -68,22 +71,23 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
         const nextBeat = currentBeatRef.current + 1;
 
         // Check if the next beat exceeds the number of columns
+        console.log(nextBeat, grid.numColumns)
         if (nextBeat >= grid.numColumns) {
-            toggleStepInputMode(); // Automatically stop if out of bounds
+            toggleStepInputMode(true); // Automatically stop if out of bounds
             currentBeatRef.current = 0; // Reset current beat for the next activation
-        }
-        else {
+        } else {
             currentBeatRef.current = nextBeat; // Update the current beat
             dispatchCurrentBeatEvent(currentBeatRef.current);
         }
     };
 
     return (
-        <button className='step-input-button' onClick={toggleStepInputMode}
-            title={currentBeatRef.current > 0 ? 'Exit step input mode' : 'Enter step input mode'}
+        <button className={`step-input-button ${stepInputMode ? 'active' : ''}`}
+            onClick={() => toggleStepInputMode()}
+            title={stepInputMode ? 'Exit step input mode' : 'Enter step input mode'}
         >
-            {currentBeatRef.current > 0 ? 'Exit' : 'Step'}
-        </button >
+            {stepInputMode ? 'Exit' : 'Step'}
+        </button>
     );
 };
 
