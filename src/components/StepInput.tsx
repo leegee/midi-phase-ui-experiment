@@ -18,13 +18,13 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
     const [stepInputMode, setStepInputMode] = useState(false); // State for step input mode
 
     const handleMIDIMessage = (event: WebMidi.MIDIMessageEvent) => {
-        const [status, note, velocity] = event.data;
+        const [status, midiNote, velocity] = event.data;
         const channel = status & 0x0F; // Get the last 4 bits
 
         if (inputChannels.includes(channel)) {
             // Check if it's a note on event
             if ((status & 0xF0) === NOTE_ON && velocity > 0) {
-                placeNote(note, velocity);
+                placeNote(midiNote, velocity);
             }
         }
     };
@@ -57,10 +57,10 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
         dispatchCurrentBeatEvent(-1);
     };
 
-    const placeNote = (pitch: number, velocity: number) => {
+    const placeNote = (midiPitch: number, velocity: number) => {
         // Create a new note at the current beat
         const newNote: GridNote = {
-            pitch: pitch - BASE_PITCH,
+            pitch: midiPitch - BASE_PITCH,
             velocity,
         };
 
