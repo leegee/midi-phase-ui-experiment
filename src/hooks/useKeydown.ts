@@ -7,6 +7,7 @@ export const useKeydown = (key: string, callback: (e: KeyboardEvent) => void) =>
         const handleKeydown = (e: KeyboardEvent) => {
             // Here we could filter by e.target if necessary
             if (e.code === key) {
+                e.preventDefault();
                 callback(e);
             }
         };
