@@ -74,6 +74,20 @@ export class Grid {
             this.beats[beatIndex].notes[note.pitch] = note;
         }
     }
+
+    // Method to double the size of the grid by inserting empty columns
+    doubleSize() {
+        const newBeats: Beat[] = [];
+
+        // Loop through each beat and insert an empty beat after each one
+        this.beats.forEach((beat) => {
+            newBeats.push(beat);
+            newBeats.push({ notes: {} });
+        });
+
+        this.beats = newBeats;
+        this.numColumns = newBeats.length;
+    }
 }
 
 export class MergedBeat {
