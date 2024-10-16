@@ -71,7 +71,6 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
         const nextBeat = currentBeatRef.current + 1;
 
         // Check if the next beat exceeds the number of columns
-        console.log(nextBeat, grid.numColumns)
         if (nextBeat >= grid.numColumns) {
             toggleStepInputMode(true); // Automatically stop if out of bounds
             currentBeatRef.current = 0; // Reset current beat for the next activation
