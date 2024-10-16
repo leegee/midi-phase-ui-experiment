@@ -8,7 +8,7 @@ interface HalveGridSizeButtonProps {
 const HalveGridSizeButton: React.FC<HalveGridSizeButtonProps> = ({ gridIndex }) => {
     const { grids, setGrid } = useMusicStore();
 
-    if (grids[gridIndex].numColumns > 4) return (<></>);
+    if (grids[gridIndex].numColumns < 4) return (<></>);
 
     const handleHalveGridSize = () => {
         const grid = grids[gridIndex];
