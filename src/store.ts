@@ -99,7 +99,7 @@ export class MergedBeat {
     }
 }
 
-interface MusicState {
+export interface MusicState {
     bpm: number;
     setBPM: (newBPM: number) => void;
 

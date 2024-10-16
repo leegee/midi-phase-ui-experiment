@@ -1,5 +1,5 @@
 import React from 'react';
-import { Midi } from '@tonejs/midi'; // Importing the Midi class from @tonejs/midi
+import { Midi } from '@tonejs/midi';
 import useMusicStore from '../store';
 import { BASE_PITCH } from './PlayMIDI';
 

@@ -16,7 +16,7 @@ const BPMInput: React.FC = () => {
     const handleBlur = () => {
         const newBPM = Number(inputValue);
         if (!isNaN(newBPM) && newBPM > 0) {
-            setBPM(newBPM); // Update the BPM in the store
+            setBPM(newBPM);
         }
     };
 

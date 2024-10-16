@@ -6,7 +6,9 @@ A React UI to experiment with real-time phasing of MIDI rhythms and first use of
 
 # To Do
 
-* Set cell units
+* Set cell units?
+
+* Colour grid?
 
 *  MIDI CLock Sync
 
