@@ -44,7 +44,7 @@ const PlayPauseButton: React.FC = () => {
         while (nextNoteTime.current < audioContextRef.current.currentTime + scheduleAheadTime) {
             grids.forEach((grid) => {
                 const currentBeatIndex = currentBeat.current % (grid.numColumns || 1);
-                const beat = grid.beats[currentBeatIndex]; // Get current beat
+                const beat = grid.beats[currentBeatIndex];
 
                 if (beat) {
                     // Schedule notes for the current beat
@@ -54,7 +54,7 @@ const PlayPauseButton: React.FC = () => {
                 }
             });
 
-            dispatchCurrentBeatEvent(currentBeat.current); // Keep current beat dispatching
+            dispatchCurrentBeatEvent(currentBeat.current);
 
             // Move to the next beat
             currentBeat.current += 1;
@@ -63,10 +63,10 @@ const PlayPauseButton: React.FC = () => {
     }, [selectedOutput, grids, intervalDuration, playNoteNow]);
 
     const scheduler = useCallback(() => {
-        if (!isPlaying || !audioContextRef.current || !isScheduling.current) return; // Check the flag
+        if (!isPlaying || !audioContextRef.current || !isScheduling.current) return;
 
-        scheduleNotes(); // Schedule notes
-        setTimeout(scheduler, lookahead); // Keep checking for the next beat if still playing
+        scheduleNotes(); s
+        setTimeout(scheduler, lookahead);
     }, [isPlaying, scheduleNotes]);
 
     const startPlayback = useCallback(() => {
@@ -75,13 +75,14 @@ const PlayPauseButton: React.FC = () => {
         }
 
         nextNoteTime.current = audioContextRef.current.currentTime; // Initialize next note time
-        isScheduling.current = true; // Start scheduling
-        scheduler(); // Start scheduling notes
+        // Start scheduling
+        isScheduling.current = true;
+        scheduler();
     }, [scheduler]);
 
     const stopPlayback = useCallback(() => {
-        isScheduling.current = false; // Stop scheduling
-        currentBeat.current = 0; // Reset beat
+        isScheduling.current = false;
+        currentBeat.current = 0;
     }, []);
 
     useEffect(() => {
