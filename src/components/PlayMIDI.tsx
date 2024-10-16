@@ -9,17 +9,17 @@ import useStore from '../store';
 export const BASE_PITCH = 21;
 const NOTE_ON = 0x90;
 const NOTE_OFF = 0x80;
+const LOOK_AHEAD_MS = 25; // How often to check (ms)
+const SCHEDULE_AHEAD_SECONDS = 0.1; // Schedule notes ahead by 100ms
 
 const PlayPauseButton: React.FC = () => {
     const { bpm, outputChannel, grids, selectedOutput } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
     const currentBeat = useRef<number>(0);
     const audioContextRef = useRef<AudioContext | null>(null);
-    const nextNoteTime = useRef<number>(0); // Time for next note in seconds
-    const lookahead = 25; // How often to check (ms)
-    const scheduleAheadTime = 0.1; // Schedule notes ahead by 100ms
-    const intervalDuration = (60 / bpm); // Time per beat (in seconds)
+    const nextNoteTimeInSeconds = useRef<number>(0); // Time for next note in seconds
     const isScheduling = useRef<boolean>(false); // Flag to stop scheduling when playback is paused
+    const intervalDurationSeconds = (60 / bpm); // Time per beat in seconds
 
     useKeydown('Space', () => {
         setIsPlaying(prev => !prev);
@@ -28,20 +28,27 @@ const PlayPauseButton: React.FC = () => {
         }
     });
 
-    const playNoteNow = useCallback((pitch: number, velocity = 75, time: number) => {
-        if (!selectedOutput) return;
-        const noteOnTime = time * 1000; // Convert seconds to ms
-        const noteOffTime = noteOnTime + (intervalDuration * 1000); // Note length is the interval
+    const playNoteNow = useCallback((pitch: number, velocity = 75) => {
+        if (!selectedOutput || !audioContextRef.current) return;
 
+        const currentTime = audioContextRef.current.currentTime; // Current time in seconds
+        const noteOnTime = currentTime; // Now
+        const noteOffTime = currentTime + intervalDurationSeconds; // After the duration
+
+        console.log(`Playing note: ${pitch}, velocity: ${velocity}, time: ${noteOnTime}`);
         selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + pitch, velocity], noteOnTime);
+
+        console.log(`Stopping note: ${pitch}, time: ${noteOffTime}`);
         selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + pitch, 0], noteOffTime);
-    }, [intervalDuration, outputChannel, selectedOutput]);
+    }, [intervalDurationSeconds, outputChannel, selectedOutput]);
 
     const scheduleNotes = useCallback(() => {
         if (!selectedOutput || !audioContextRef.current) return;
 
+        const currentTime = audioContextRef.current.currentTime; // Get current audio context time
+
         // Schedule notes ahead of time for all grids
-        while (nextNoteTime.current < audioContextRef.current.currentTime + scheduleAheadTime) {
+        while (nextNoteTimeInSeconds.current < currentTime + SCHEDULE_AHEAD_SECONDS) {
             grids.forEach((grid) => {
                 const currentBeatIndex = currentBeat.current % (grid.numColumns || 1);
                 const beat = grid.beats[currentBeatIndex];
@@ -49,7 +56,7 @@ const PlayPauseButton: React.FC = () => {
                 if (beat) {
                     // Schedule notes for the current beat
                     Object.values(beat.notes).forEach(note => {
-                        playNoteNow(note.pitch, note.velocity, nextNoteTime.current);
+                        playNoteNow(note.pitch, note.velocity);
                     });
                 }
             });
@@ -58,15 +65,15 @@ const PlayPauseButton: React.FC = () => {
 
             // Move to the next beat
             currentBeat.current += 1;
-            nextNoteTime.current += intervalDuration; // Schedule next beat
+            nextNoteTimeInSeconds.current += intervalDurationSeconds; // Schedule next beat
         }
-    }, [selectedOutput, grids, intervalDuration, playNoteNow]);
+    }, [selectedOutput, grids, intervalDurationSeconds, playNoteNow]);
 
     const scheduler = useCallback(() => {
         if (!isPlaying || !audioContextRef.current || !isScheduling.current) return;
 
         scheduleNotes();
-        setTimeout(scheduler, lookahead);
+        setTimeout(scheduler, LOOK_AHEAD_MS);
     }, [isPlaying, scheduleNotes]);
 
     const startPlayback = useCallback(() => {
@@ -74,7 +81,7 @@ const PlayPauseButton: React.FC = () => {
             audioContextRef.current = new window.AudioContext();
         }
 
-        nextNoteTime.current = audioContextRef.current.currentTime; // Initialize next note time
+        nextNoteTimeInSeconds.current = audioContextRef.current.currentTime; // Initialize next note time
         // Start scheduling
         isScheduling.current = true;
         scheduler();
@@ -105,7 +112,7 @@ const PlayPauseButton: React.FC = () => {
     useEffect(() => {
         const handlePlayNote = (event: CustomEvent<PlayNoteNowDetail>) => {
             const { pitch, velocity } = event.detail;
-            playNoteNow(pitch, velocity, audioContextRef.current?.currentTime || 0);
+            playNoteNow(pitch, velocity);
         };
 
         window.addEventListener(PLAY_NOTE_NOW_EVENT_NAME, handlePlayNote as EventListener);
