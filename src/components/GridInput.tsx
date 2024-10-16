@@ -44,7 +44,7 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
                 // Adjust velocity if CTRL is pressed
                 existingNote.velocity = velocity;
                 updateNoteVelocity(gridIndex, beatIndex, pitch, velocity);
-                dispatchPlayNoteNowEvent(pitch, velocity);
+                // dispatchPlayNoteNowEvent(pitch, velocity);
             } else {
                 // Remove the note if it exists and CTRL is not pressed
                 delete notes[pitch];
@@ -89,7 +89,6 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             // Use the dragging note's pitch and calculate the velocity based on the mouse Y position
             const velocity = Math.max(0, Math.min(127, 127 - e.clientY / 4));
 
-            // Instead of trying to find the beatIndex here, we can keep track of it when starting the drag
             const beatIndex = Math.floor(e.clientX / (gridRef.current?.clientWidth / grid.numColumns)); // Adjust based on your layout
             // toggleNote(draggingNote.pitch, beatIndex, velocity); // Use stored pitch from dragging note
             debouncedToggleNoteRef.current(draggingNote.pitch, beatIndex, velocity); // Use debounced function
