@@ -43,7 +43,7 @@ const DeviceSelector: React.FC = () => {
                             >
                                 <option value="" disabled>Select MIDI Input</option>
                                 {inputs.map(input => (
-                                    <option key={input.id} value={input.id}>
+                                    <option key={'input-' + input.id} value={input.id}>
                                         {input.name}
                                     </option>
                                 ))}
@@ -69,7 +69,7 @@ const DeviceSelector: React.FC = () => {
                             >
                                 <option value="" disabled>Select MIDI Output</option>
                                 {outputs.map(output => (
-                                    <option key={output.id} value={output.id}>
+                                    <option key={'output-' + output.id} value={output.id}>
                                         {output.name}
                                     </option>
                                 ))}
