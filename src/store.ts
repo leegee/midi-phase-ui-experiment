@@ -1,8 +1,12 @@
 // src/store.ts
 import { create } from 'zustand';
 
-const SATURATION = 70;
-const LIGHTNESS = 50;
+import { Grid } from './classes/Grid';
+import { MergedBeat } from './classes/MergedBeat';
+
+export const SATURATION = 70;
+export const LIGHTNESS = 50;
+const EXCLUDE_FROM_UNDO = ['selectedInput', 'selectedOutput', 'inputChannels', 'outputChannel', 'inputs', 'outputs'];
 
 export interface GridNote {
     pitch: number;
@@ -19,116 +23,9 @@ export interface Beat {
     notes: Record<number, GridNote>; // Dictionary indexed by pitch
 }
 
-export interface MergedBeat {
-    notes: Record<number, GridNoteMerged>; // Merged notes indexed by pitch
-}
-
-export class Grid {
-    beats: Beat[];
-    numColumns: number;
-    colour: string;
-
-    constructor(numColumns: number, colour: string);
-    constructor(params: { beats: { notes: Record<number, GridNote> }[]; numColumns: number; colour: string });
-
-    constructor(arg: number | { beats: { notes: Record<number, GridNote> }[]; numColumns: number; colour: string }, colour?: string) {
-        if (typeof arg === 'number') {
-            this.numColumns = arg;
-            this.beats = Array.from({ length: arg }, () => ({ notes: {} }));
-            this.colour = colour || 'blue';
-        } else {
-            this.numColumns = arg.numColumns;
-            this.beats = arg.beats;
-            this.colour = arg.colour;
-        }
-    }
-
-    clear() {
-        this.beats = [];
-    }
-
-    setNumColumns(numColumns: number) {
-        this.numColumns = numColumns;
-    }
-
-    updateNoteVelocity(beatIndex: number, pitch: number, velocity: number) {
-        if (!this.beats[beatIndex]) {
-            this.beats[beatIndex] = { notes: {} }; // Create the beat if it doesn't exist
-        }
-
-        const beat = this.beats[beatIndex];
-
-        // Update the note velocity in the dictionary
-        if (beat.notes[pitch]) {
-            beat.notes[pitch].velocity = velocity;
-        }
-    }
-
-    setOrUpdateNote(beatIndex: number, note: GridNote) {
-        if (note.velocity === 0) {
-            delete this.beats[beatIndex].notes[note.pitch];
-        } else {
-            if (!this.beats[beatIndex]) {
-                this.beats[beatIndex] = { notes: {} };
-            }
-            this.beats[beatIndex].notes[note.pitch] = note;
-        }
-    }
-
-    // Method to double the size of the grid by inserting empty columns
-    doubleSize() {
-        const newBeats: Beat[] = [];
-
-        // Loop through each beat and insert an empty beat after each one
-        this.beats.forEach((beat) => {
-            newBeats.push(beat);
-            newBeats.push({ notes: {} });
-        });
-
-        this.beats = newBeats;
-        this.numColumns = newBeats.length;
-    }
-
-    // Method to halve the size of the grid, ignoring the final column in grids with an odd number of columns
-    halveSize() {
-        const newBeats: Beat[] = [];
-
-        // Loop through every second beat
-        for (let i = 0; i < this.beats.length; i += 2) {
-            newBeats.push(this.beats[i]);
-        }
-
-        this.beats = newBeats;
-        this.numColumns = newBeats.length;
-    }
-}
-
-export class MergedBeat {
-    notes: Record<number, GridNoteMerged>;
-
-    constructor() {
-        this.notes = {};
-    }
-
-    mergeWithGridBeat(grid: Grid, beatIndex: number) {
-        const beat = grid.beats[beatIndex];
-        Object.entries(beat.notes).forEach(([pitch, note]) => {
-            const numericPitch = Number(pitch);
-            if (!this.notes[numericPitch]) {
-                // If the note doesn't exist, create a new entry with the grid's color
-                this.notes[numericPitch] = { ...note, colour: grid.colour };
-            } else {
-                // If the note already exists, merge the colors
-                const existingNote = this.notes[numericPitch];
-                existingNote.colour = mergeColors(existingNote.colour, grid.colour);
-            }
-        });
-    }
-}
-
 export interface MusicState {
     bpm: number;
-    setBPM: (newBPM: number) => void;
+    setBPM: (bpm: number) => void;
 
     grids: Grid[];
     setGrid: (gridIndex: number, grid: Grid) => void;
@@ -148,31 +45,56 @@ export interface MusicState {
 
     selectedInput: WebMidi.MIDIInput | null;
     setSelectedInput: (input: WebMidi.MIDIInput | null) => void;
+
     selectedOutput: WebMidi.MIDIOutput | null;
     setSelectedOutput: (output: WebMidi.MIDIOutput | null) => void;
+
     inputs: WebMidi.MIDIInput[];
     setInputs: (inputs: WebMidi.MIDIInput[]) => void;
+
     outputs: WebMidi.MIDIOutput[];
     setOutputs: (outputs: WebMidi.MIDIOutput[]) => void;
     error: string | null;
     setError: (error: string | null) => void;
+
+    undoStack: MusicState[];
+    undo: () => void;
 }
 
 // Create the store
-const useMusicStore = create<MusicState>((set) => ({
-    selectedInput: null,
-    setSelectedInput: (input) => set({ selectedInput: input }),
-    selectedOutput: null,
-    setSelectedOutput: (output) => set({ selectedOutput: output }),
-    inputs: [],
-    setInputs: (inputs) => set({ inputs }),
-    outputs: [],
-    setOutputs: (outputs) => set({ outputs }),
-    error: null,
-    setError: (error) => set({ error }),
-
+const useMusicStore = create<MusicState>((set, get) => ({
     bpm: 120,
-    setBPM: (newBPM: number) => set({ bpm: newBPM }),
+    setBPM: (bpm: number) => set((state) => {
+        pushToUndoStack();
+        return { ...state, bpm };
+    }),
+
+    selectedInput: null,
+    setSelectedInput: (selectedInput) => set((state) => {
+        pushToUndoStack();
+        return { ...state, selectedInput };
+    }),
+
+    selectedOutput: null,
+    setSelectedOutput: (selectedOutput) => set((state) => {
+        pushToUndoStack();
+        return { ...state, selectedOutput }
+    }),
+
+    inputs: [],
+    setInputs: (inputs) => set((state) => {
+        pushToUndoStack();
+        return { ...state, inputs };
+    }),
+
+    outputs: [],
+    setOutputs: (outputs) => set((state) => {
+        pushToUndoStack();
+        return { ...state, outputs };
+    }),
+
+    error: null,
+    setError: (error) => set((state) => ({ ...state, error })),
 
     grids: [
         new Grid(3, colours(1, 2)),
@@ -180,12 +102,14 @@ const useMusicStore = create<MusicState>((set) => ({
     ],
     setGrid: (gridIndex: number, grid: Grid) =>
         set((state) => {
+            pushToUndoStack();
             const newGrids = [...state.grids];
             newGrids[gridIndex] = grid;
             return { grids: newGrids };
         }),
     clearGrid: (gridIndex: number) =>
         set((state) => {
+            pushToUndoStack();
             const newGrids = [...state.grids];
             if (newGrids[gridIndex]) {
                 newGrids[gridIndex].clear();
@@ -195,6 +119,7 @@ const useMusicStore = create<MusicState>((set) => ({
     // Insert a new grid after the specified index
     addGrid: (insertAfterIndex: number, numColumns: number = 4) =>
         set((state) => {
+            pushToUndoStack();
             const newGrids = [...state.grids];
             newGrids.splice(insertAfterIndex + 1, 0, new Grid(numColumns, 'red'));
             newGrids.forEach((grid, index) => {
@@ -204,6 +129,7 @@ const useMusicStore = create<MusicState>((set) => ({
         }),
     removeGrid: (gridIndex: number) =>
         set((state) => {
+            pushToUndoStack();
             const newGrids = [...state.grids];
             if (gridIndex >= 0 && gridIndex < newGrids.length) {
                 newGrids.splice(gridIndex, 1);
@@ -213,6 +139,7 @@ const useMusicStore = create<MusicState>((set) => ({
 
     setNumColumns: (gridIndex: number, numColumns: number) =>
         set((state) => {
+            pushToUndoStack();
             const newGrids = [...state.grids];
             if (newGrids[gridIndex]) {
                 newGrids[gridIndex].setNumColumns(numColumns);
@@ -222,6 +149,7 @@ const useMusicStore = create<MusicState>((set) => ({
 
     updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) =>
         set((state) => {
+            pushToUndoStack();
             const newGrids = [...state.grids];
             newGrids[gridIndex].updateNoteVelocity(beatIndex, pitch, velocity);
             return { grids: newGrids };
@@ -229,6 +157,7 @@ const useMusicStore = create<MusicState>((set) => ({
 
     setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) =>
         set((state) => {
+            pushToUndoStack();
             const newGrids = [...state.grids];
             newGrids[gridIndex].setOrUpdateNote(beatIndex, note);
             return { grids: newGrids };
@@ -236,6 +165,7 @@ const useMusicStore = create<MusicState>((set) => ({
 
     mergedBeats: [],
     mergeGrids: () => set((state) => {
+        pushToUndoStack();
         const { grids } = state;
 
         if (grids.length === 0) return { mergedBeats: [] };
@@ -259,11 +189,75 @@ const useMusicStore = create<MusicState>((set) => ({
     }),
 
     inputChannels: Array.from({ length: 16 }, (_, index) => index),
-    setInputChannels: (channels) => set({ inputChannels: channels }),
+    setInputChannels: (channels) => {
+        pushToUndoStack();
+        set({ inputChannels: channels })
+    },
 
     outputChannel: 1,
-    setOutputChannel: (channel) => set({ outputChannel: channel }),
+    setOutputChannel: (channel) => {
+        pushToUndoStack();
+        set({ outputChannel: channel })
+    },
+
+    undoStack: [],
+    undo: () => {
+        const { undoStack } = get();
+
+        if (undoStack.length === 0) {
+            console.warn("No state to undo.");
+            return;
+        }
+
+        // Log the current state before undoing
+        const currentState = get();
+        console.log("Current state before undo:", currentState);
+
+        const lastState = undoStack[undoStack.length - 1];
+
+        // Restore the last state
+        set((state) => {
+            const newState = {
+                ...state,
+                ...lastState,
+                undoStack: undoStack.slice(0, undoStack.length - 1), // Remove the last state from the stack
+            };
+
+            // Log the new state after undoing
+            console.log("New state after undo:", newState);
+
+            return newState;
+        });
+    },
+
 }));
+
+
+function pushToUndoStack() {
+    const currentState = useMusicStore.getState();
+
+    const stateToStore = Object.keys(currentState).reduce((acc, key) => {
+        if (!EXCLUDE_FROM_UNDO.includes(key as keyof MusicState)) {
+            acc[key as keyof MusicState] = currentState[key as keyof MusicState] as any; // Using 'as any' because my head hurts.
+        }
+        return acc;
+    }, {} as Record<string, any>);
+
+    useMusicStore.setState((state) => {
+        const newUndoStack = [
+            ...state.undoStack,
+            JSON.parse(JSON.stringify(stateToStore)),
+        ];
+
+        // Log the new state after setState
+        console.log("Updated undo stack:", newUndoStack);
+
+        return {
+            undoStack: newUndoStack,
+        };
+    });
+}
+
 
 const gcd = (a: number, b: number): number => {
     return b === 0 ? a : gcd(b, a % b);
@@ -279,28 +273,5 @@ function colours(index: number, total: number): string {
     return `hsl(${hue}, ${SATURATION}%, ${LIGHTNESS}%)`;
 }
 
-function mergeColors(existingColor: string, newColor: string): string {
-    const existingHue = parseHSL(existingColor);
-    const newHue = parseHSL(newColor);
-
-    // Merge hue by averaging
-    const mergedHSL = {
-        hue: (existingHue + newHue) / 2,
-        saturation: SATURATION,
-        lightness: LIGHTNESS,
-    };
-
-    return `hsl(${Math.round(mergedHSL.hue)}, ${Math.round(mergedHSL.saturation)}%, ${Math.round(mergedHSL.lightness)}%)`;
-}
-
-function parseHSL(hsl: string): number {
-    const regex = /hsl\(\s*(\d+)\s*,/; // Only capture the hue
-    const match = hsl.match(regex);
-    if (!match) {
-        throw new Error('Invalid HSL color format');
-    }
-
-    return Number(match[1]); // Return only the hue value
-}
 
 export default useMusicStore;

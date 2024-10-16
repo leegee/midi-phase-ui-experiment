@@ -8,6 +8,7 @@ import DeviceSelector from './components/DeviceSelector';
 import PlayPauseButton from './components/PlayMIDI';
 import Grids from './components/Grids';
 import SaveMIDI from './components/SaveMIDI';
+import UndoButton from './components/UndoButton';
 
 const App: React.FC = () => {
   const { error, selectedInput, selectedOutput } = useMIDI();
@@ -48,6 +49,7 @@ const App: React.FC = () => {
           <h1>MIDI Phase  Editor</h1>
           <PlayPauseButton />
           <BPMInput />
+          <UndoButton />
           <SaveMIDI />
           <DeviceSelector />
         </section>
