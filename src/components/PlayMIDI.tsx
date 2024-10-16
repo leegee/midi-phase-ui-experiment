@@ -65,7 +65,7 @@ const PlayPauseButton: React.FC = () => {
     const scheduler = useCallback(() => {
         if (!isPlaying || !audioContextRef.current || !isScheduling.current) return;
 
-        scheduleNotes(); s
+        scheduleNotes();
         setTimeout(scheduler, lookahead);
     }, [isPlaying, scheduleNotes]);
 
