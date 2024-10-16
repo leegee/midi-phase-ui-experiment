@@ -60,7 +60,7 @@ const PlayPauseButton: React.FC = () => {
             currentBeat.current += 1;
             nextNoteTime.current += intervalDuration; // Schedule next beat
         }
-    }, [selectedOutput, grids, playNoteNow]);
+    }, [selectedOutput, grids, intervalDuration, playNoteNow]);
 
     const scheduler = useCallback(() => {
         if (!isPlaying || !audioContextRef.current || !isScheduling.current) return; // Check the flag
