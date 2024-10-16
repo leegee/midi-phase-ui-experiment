@@ -35,6 +35,8 @@ export interface MusicState {
     setNumColumns: (gridIndex: number, numColumns: number) => void;
     updateNoteVelocity: (gridIndex: number, beatIndex: number, pitch: number, velocity: number) => void;
     setOrUpdateNoteInGrid: (gridIndex: number, beatIndex: number, note: GridNote) => void;
+    deleteNoteFromGrid: (gridIndex: number, beatIndex: number, pitch: number) => void;
+
     mergedBeats: MergedBeat[];
     mergeGrids: () => void;
 
@@ -45,15 +47,14 @@ export interface MusicState {
 
     selectedInput: WebMidi.MIDIInput | null;
     setSelectedInput: (input: WebMidi.MIDIInput | null) => void;
-
     selectedOutput: WebMidi.MIDIOutput | null;
     setSelectedOutput: (output: WebMidi.MIDIOutput | null) => void;
 
     inputs: WebMidi.MIDIInput[];
     setInputs: (inputs: WebMidi.MIDIInput[]) => void;
-
     outputs: WebMidi.MIDIOutput[];
     setOutputs: (outputs: WebMidi.MIDIOutput[]) => void;
+
     error: string | null;
     setError: (error: string | null) => void;
 
@@ -163,6 +164,22 @@ const useMusicStore = create<MusicState>((set, get) => ({
             return { grids: newGrids };
         }),
 
+    deleteNoteFromGrid: (gridIndex: number, beatIndex: number, pitch: number) =>
+        set((state) => {
+            pushToUndoStack();
+            const newGrids = [...state.grids];
+            const grid = newGrids[gridIndex];
+            if (grid) {
+                const notes = grid.beats[beatIndex]?.notes || {};
+                if (notes[pitch]) {
+                    delete notes[pitch]; // Remove the note from the notes object
+                    grid.beats[beatIndex].notes = { ...notes }; // Update the notes of the specific beat
+                }
+            }
+
+            return { grids: newGrids };
+        }),
+
     mergedBeats: [],
     mergeGrids: () => set((state) => {
         pushToUndoStack();
@@ -202,6 +219,7 @@ const useMusicStore = create<MusicState>((set, get) => ({
 
     undoStack: [],
     undo: () => {
+        return; // noop
         const { undoStack } = get();
 
         if (undoStack.length === 0) {
@@ -234,6 +252,7 @@ const useMusicStore = create<MusicState>((set, get) => ({
 
 
 function pushToUndoStack() {
+    return; // noop
     const currentState = useMusicStore.getState();
 
     const stateToStore = Object.keys(currentState).reduce((acc, key) => {

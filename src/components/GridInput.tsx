@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import './GridInput.css';
 import useMusicStore, { type GridNote } from '../store';
@@ -11,109 +11,47 @@ interface GridInputProps {
     gridIndex: number;
 }
 
-const debounce = (func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout | null = null;
-
-    return (...args: any) => {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-        }
-
-        timeoutId = setTimeout(() => {
-            func(...args);
-        }, delay);
-    };
-};
 
 const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
-    const { grids, setGrid, updateNoteVelocity, setOrUpdateNoteInGrid } = useMusicStore();
+    const { grids, setGrid, updateNoteVelocity, setOrUpdateNoteInGrid, deleteNoteFromGrid } = useMusicStore();
     const grid = grids[gridIndex];
     const gridRef = useRef<HTMLDivElement | null>(null);
     const cellRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: GRID_PITCH_RANGE }, () => Array(grid ? grid.numColumns : 0).fill(null)));
 
-    const [isCtrlPressed, setIsCtrlPressed] = useState(false);
-    const [draggingNote, setDraggingNote] = useState<GridNote | null>(null);
-
-    const toggleNote = useCallback((pitch: number, beatIndex: number, velocity: number = 100) => {
+    const toggleNote = useCallback((pitch: number, beatIndex: number, velocity?: number | undefined) => {
         const grid = grids[gridIndex];
 
         const notes = grid.beats[beatIndex]?.notes || {};
         const existingNote = notes[pitch];
 
         if (existingNote) {
-            if (isCtrlPressed) {
-                // Adjust velocity if CTRL is pressed
+            if (velocity) {
                 existingNote.velocity = velocity;
                 updateNoteVelocity(gridIndex, beatIndex, pitch, velocity);
-                // dispatchPlayNoteNowEvent(pitch, velocity);
             } else {
                 // Remove the note if it exists and CTRL is not pressed
                 delete notes[pitch];
-                setOrUpdateNoteInGrid(gridIndex, beatIndex, { pitch, velocity: 0 }); // Use a default velocity if needed
+                deleteNoteFromGrid(gridIndex, beatIndex, pitch);
             }
         } else {
             // Add a new note if it does not exist
-            const newNote: GridNote = { pitch, velocity };
+            const newNote: GridNote = { pitch, velocity: velocity || 75 };
             setOrUpdateNoteInGrid(gridIndex, beatIndex, newNote);
-            dispatchPlayNoteNowEvent(pitch, velocity);
+            dispatchPlayNoteNowEvent(pitch, velocity || 75);
         }
-    }, [isCtrlPressed, gridIndex, setOrUpdateNoteInGrid, updateNoteVelocity, grids]);
-
-    const debouncedToggleNoteRef = useRef(debounce(toggleNote, 25));
-    // Update the ref whenever toggleNote changes
-    useEffect(() => {
-        debouncedToggleNoteRef.current = debounce(toggleNote, 25);
-    }, [toggleNote]);
+    }, [gridIndex, setOrUpdateNoteInGrid, deleteNoteFromGrid, updateNoteVelocity, grids]);
 
     const handleMouseDown = (pitch: number, e: React.MouseEvent<HTMLDivElement>) => {
         const beatIndex = Number(e.currentTarget.dataset.beat);
         if (e.ctrlKey) {
-            setIsCtrlPressed(true);
-
-            // Access the current grid from the store
-            const grid = grids[gridIndex];
-
-            // Check if the note exists in the specified beat
-            const note = grid.beats[beatIndex]?.notes[pitch];
-
-            // Set dragging note to the existing note or create a new one
-            setDraggingNote(note || { pitch, velocity: 75 });
+            const velocity = Number(prompt('Enter new velocity (1-127)', '75'));
+            if (velocity) {
+                toggleNote(pitch, beatIndex, velocity);
+            }
         } else {
-            toggleNote(pitch, beatIndex); // Call toggleNote with the updated signature
+            toggleNote(pitch, beatIndex);
         }
     };
-
-    const handleMouseMove = useCallback((e: MouseEvent) => {
-        if (draggingNote && isCtrlPressed) {
-            if (!gridRef.current?.clientWidth) return;
-
-            // Use the dragging note's pitch and calculate the velocity based on the mouse Y position
-            const velocity = Math.max(0, Math.min(127, 127 - e.clientY / 4));
-
-            const beatIndex = Math.floor(e.clientX / (gridRef.current?.clientWidth / grid.numColumns)); // Adjust based on your layout
-            // toggleNote(draggingNote.pitch, beatIndex, velocity); // Use stored pitch from dragging note
-            debouncedToggleNoteRef.current(draggingNote.pitch, beatIndex, velocity); // Use debounced function
-        }
-    }, [draggingNote, grid.numColumns, isCtrlPressed]);
-
-
-    const handleMouseUp = () => {
-        setIsCtrlPressed(false);
-        setDraggingNote(null);
-    };
-
-    // Set up event listeners for drag
-    useEffect(() => {
-        if (isCtrlPressed && draggingNote) {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
-        }
-
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isCtrlPressed, draggingNote, handleMouseMove]);
 
     const calculateOpacity = (velocity: number) => {
         return velocity / 127; // Normalize velocity to opacity range [0, 1]
