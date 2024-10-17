@@ -34,10 +34,11 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
             // Reset current beat when exiting step input mode
             currentBeatRef.current = 0;
             stopListening();
-            setStepInputMode(false); // Update state
+            setStepInputMode(false);
+            scrollToTop();
         } else {
             startListening();
-            setStepInputMode(true); // Update state
+            setStepInputMode(true);
         }
     };
 
@@ -79,6 +80,18 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
             dispatchCurrentBeatEvent(currentBeatRef.current);
         }
     };
+
+    const scrollToTop = () => {
+        const firstActiveRow = document.querySelector('.grid-cell.active');
+        console.log(firstActiveRow)
+        if (firstActiveRow) {
+            firstActiveRow.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+            });
+        };
+    }
 
     return (
         <button className={`step-input-button ${stepInputMode ? 'active' : ''}`}
