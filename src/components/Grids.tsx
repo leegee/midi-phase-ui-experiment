@@ -32,7 +32,7 @@ const Grids: React.FC = () => {
         const mergedGridElement = mergedGridRef.current;
 
         if (gridsElement && mergedGridElement) {
-            const syncScroll = (e: Event) => handleScroll(gridsRef, mergedGridRef);
+            const syncScroll = () => handleScroll(gridsRef, mergedGridRef);
             gridsElement.addEventListener('scroll', syncScroll);
             mergedGridElement.addEventListener('scroll', () => handleScroll(mergedGridRef, gridsRef));
 
