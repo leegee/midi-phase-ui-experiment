@@ -6,7 +6,9 @@ import { MergedBeat } from './classes/MergedBeat';
 
 export const SATURATION = 70;
 export const LIGHTNESS = 50;
-const EXCLUDE_FROM_UNDO = ['selectedInput', 'selectedOutput', 'inputChannels', 'outputChannel', 'inputs', 'outputs'];
+
+const MAX_HISTORY_ENTRIES = 30;
+const INCLUDE_IN_HISTORY = ['bpm', 'grids'];
 
 export interface GridNote {
     pitch: number;
@@ -72,25 +74,21 @@ const useMusicStore = create<MusicState>((set, get) => ({
 
     selectedInput: null,
     setSelectedInput: (selectedInput) => set((state) => {
-        pushToUndoStack();
         return { ...state, selectedInput };
     }),
 
     selectedOutput: null,
     setSelectedOutput: (selectedOutput) => set((state) => {
-        pushToUndoStack();
         return { ...state, selectedOutput }
     }),
 
     inputs: [],
     setInputs: (inputs) => set((state) => {
-        pushToUndoStack();
         return { ...state, inputs };
     }),
 
     outputs: [],
     setOutputs: (outputs) => set((state) => {
-        pushToUndoStack();
         return { ...state, outputs };
     }),
 
@@ -182,7 +180,6 @@ const useMusicStore = create<MusicState>((set, get) => ({
 
     mergedBeats: [],
     mergeGrids: () => set((state) => {
-        pushToUndoStack();
         const { grids } = state;
 
         if (grids.length === 0) return { mergedBeats: [] };
@@ -207,19 +204,16 @@ const useMusicStore = create<MusicState>((set, get) => ({
 
     inputChannels: Array.from({ length: 16 }, (_, index) => index),
     setInputChannels: (channels) => {
-        pushToUndoStack();
         set({ inputChannels: channels })
     },
 
     outputChannel: 1,
     setOutputChannel: (channel) => {
-        pushToUndoStack();
         set({ outputChannel: channel })
     },
 
     undoStack: [],
     undo: () => {
-        return; // noop
         const { undoStack } = get();
 
         if (undoStack.length === 0) {
@@ -228,7 +222,10 @@ const useMusicStore = create<MusicState>((set, get) => ({
         }
 
         // Log the current state before undoing
-        const currentState = get();
+        const currentState = Object.fromEntries(
+            Object.entries(get()).filter(([key]) => INCLUDE_IN_HISTORY.includes(key))
+        );
+
         console.log("Current state before undo:", currentState);
 
         const lastState = undoStack[undoStack.length - 1];
@@ -252,19 +249,15 @@ const useMusicStore = create<MusicState>((set, get) => ({
 
 
 function pushToUndoStack() {
-    return; // noop
-    const currentState = useMusicStore.getState();
+    console.log('called push to state');
 
-    const stateToStore = Object.keys(currentState).reduce((acc, key) => {
-        if (!EXCLUDE_FROM_UNDO.includes(key as keyof MusicState)) {
-            acc[key as keyof MusicState] = currentState[key as keyof MusicState] as any; // Using 'as any' because my head hurts.
-        }
-        return acc;
-    }, {} as Record<string, any>);
+    const stateToStore = Object.fromEntries(
+        Object.entries(useMusicStore.getState()).filter(([key]) => INCLUDE_IN_HISTORY.includes(key))
+    );
 
     useMusicStore.setState((state) => {
         const newUndoStack = [
-            ...state.undoStack,
+            ...state.undoStack.slice(-MAX_HISTORY_ENTRIES + 1),
             JSON.parse(JSON.stringify(stateToStore)),
         ];
 
