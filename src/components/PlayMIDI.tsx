@@ -28,22 +28,31 @@ const PlayPauseButton: React.FC = () => {
         }
     });
 
-    const playNoteNow = useCallback((pitch: number, velocity = 75) => {
+    const playNoteNow = useCallback(async (pitch: number, velocity = 75) => {
         if (!selectedOutput || !audioContextRef.current) return;
+        if (audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+        }
 
+        pitch += BASE_PITCH;
         const currentTime = audioContextRef.current.currentTime; // Current time in seconds
         const noteOnTime = currentTime; // Now
         const noteOffTime = currentTime + intervalDurationSeconds; // After the duration
 
+        console.log(selectedOutput);
+
         console.log(`Playing note: ${pitch}, velocity: ${velocity}, time: ${noteOnTime}`);
-        selectedOutput.send([NOTE_ON + outputChannel, BASE_PITCH + pitch, velocity], noteOnTime);
+        selectedOutput.send([NOTE_ON + outputChannel, pitch, velocity], noteOnTime);
 
         console.log(`Stopping note: ${pitch}, time: ${noteOffTime}`);
-        selectedOutput.send([NOTE_OFF + outputChannel, BASE_PITCH + pitch, 0], noteOffTime);
+        selectedOutput.send([NOTE_OFF + outputChannel, pitch, 0], noteOffTime);
     }, [intervalDurationSeconds, outputChannel, selectedOutput]);
 
-    const scheduleNotes = useCallback(() => {
+    const scheduleNotes = useCallback(async () => {
         if (!selectedOutput || !audioContextRef.current) return;
+        if (audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+        }
 
         const currentTime = audioContextRef.current.currentTime; // Get current audio context time
 
@@ -71,7 +80,6 @@ const PlayPauseButton: React.FC = () => {
 
     const scheduler = useCallback(() => {
         if (!isPlaying || !audioContextRef.current || !isScheduling.current) return;
-
         scheduleNotes();
         setTimeout(scheduler, LOOK_AHEAD_MS);
     }, [isPlaying, scheduleNotes]);
