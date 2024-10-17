@@ -83,7 +83,6 @@ const StepInput: React.FC<StepInputProps> = ({ gridIndex }) => {
 
     const scrollToTop = () => {
         const firstActiveRow = document.querySelector('.grid-cell.active');
-        console.log(firstActiveRow)
         if (firstActiveRow) {
             firstActiveRow.scrollIntoView({
                 behavior: 'smooth',
