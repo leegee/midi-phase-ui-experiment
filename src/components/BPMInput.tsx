@@ -21,20 +21,18 @@ const BPMInput: React.FC = () => {
     };
 
     return (
-        <section className='padded-container bpm-selector-component'>
-            <label>
-                BPM:
-                <input
-                    className="bpm-input"
-                    type="number"
-                    value={inputValue}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    min={1}
-                    max={300}
-                />
-            </label>
-        </section>
+        <label className='bpm-selector-component'>
+            BPM:
+            <input
+                className="bpm-input"
+                type="number"
+                value={inputValue}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                min={1}
+                max={300}
+            />
+        </label>
     );
 };
 

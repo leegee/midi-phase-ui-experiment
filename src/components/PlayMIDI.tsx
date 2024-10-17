@@ -129,11 +129,9 @@ const PlayPauseButton: React.FC = () => {
     }, [playNoteNow]);
 
     return (
-        <section className='padded-container'>
-            <button onClick={handlePlayPause} title='SPACE will also toggle playback'>
-                {isPlaying ? '⏸︎ Pause' : '⏵︎ Play'}
-            </button>
-        </section>
+        <button onClick={handlePlayPause} title='SPACE will also toggle playback'>
+            {isPlaying ? '⏸︎ Pause' : '⏵︎ Play'}
+        </button>
     );
 };
 

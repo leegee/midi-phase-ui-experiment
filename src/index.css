@@ -31,7 +31,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-.padded-container {
-  margin: var(--midi-app-container-padding);
-}

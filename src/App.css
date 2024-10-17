@@ -23,3 +23,7 @@ main {
   opacity: 50%;
   margin-right: auto;
 }
+
+.app-ctrls > * {
+   margin: var(--midi-app-container-padding);
+}
