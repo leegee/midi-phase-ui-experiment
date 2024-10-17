@@ -256,17 +256,24 @@ function pushToUndoStack() {
     );
 
     useMusicStore.setState((state) => {
-        const newUndoStack = [
-            ...state.undoStack.slice(-MAX_HISTORY_ENTRIES + 1),
-            JSON.parse(JSON.stringify(stateToStore)),
-        ];
+        const isIdentical = state.undoStack.length > 0 &&
+            JSON.stringify(state.undoStack[state.undoStack.length - 1]) === JSON.stringify(stateToStore);
 
-        // Log the new state after setState
-        console.log("Updated undo stack:", newUndoStack);
+        if (!isIdentical) {
+            const newUndoStack = [
+                ...state.undoStack.slice(-MAX_HISTORY_ENTRIES + 1),
+                JSON.parse(JSON.stringify(stateToStore)),
+            ];
 
-        return {
-            undoStack: newUndoStack,
-        };
+            console.log("Updated undo stack:", newUndoStack);
+
+            return {
+                undoStack: newUndoStack,
+            };
+        }
+
+        // No change
+        return state;
     });
 }
 
