@@ -1,3 +1,4 @@
+// hooks/useMIDI.ts
 import { useEffect, useRef } from 'react';
 import useMusicStore from '../store';
 
