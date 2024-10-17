@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/midi-phase-ui-experiment/static/css/main.87d2935f.css",
-    "main.js": "/midi-phase-ui-experiment/static/js/main.58af7569.js",
+    "main.css": "/midi-phase-ui-experiment/static/css/main.ebd4cab4.css",
+    "main.js": "/midi-phase-ui-experiment/static/js/main.d09b18a1.js",
     "static/js/453.c0425681.chunk.js": "/midi-phase-ui-experiment/static/js/453.c0425681.chunk.js",
     "index.html": "/midi-phase-ui-experiment/index.html",
-    "main.87d2935f.css.map": "/midi-phase-ui-experiment/static/css/main.87d2935f.css.map",
-    "main.58af7569.js.map": "/midi-phase-ui-experiment/static/js/main.58af7569.js.map",
+    "main.ebd4cab4.css.map": "/midi-phase-ui-experiment/static/css/main.ebd4cab4.css.map",
+    "main.d09b18a1.js.map": "/midi-phase-ui-experiment/static/js/main.d09b18a1.js.map",
     "453.c0425681.chunk.js.map": "/midi-phase-ui-experiment/static/js/453.c0425681.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.87d2935f.css",
-    "static/js/main.58af7569.js"
+    "static/css/main.ebd4cab4.css",
+    "static/js/main.d09b18a1.js"
   ]
 }
