@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import throttle from 'lodash.throttle';
 
 import './GridInput.css';
 import useMusicStore, { type GridNote } from '../store';
@@ -87,20 +88,14 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
         };
     }, [grid]);
 
-    const handleResizerMouseDown = (e: React.MouseEvent) => {
-        e.preventDefault();
-        const initialX = e.clientX;
-        const initialNumColumns = grid.numColumns;
+    const handleMouseMove = throttle((moveEvent: MouseEvent, initialX: number, initialNumColumns: number, grid: Grid) => {
+        const deltaX = moveEvent.clientX - initialX;
+        const newNumColumns = Math.max(1, initialNumColumns + Math.floor(deltaX / 20));
 
-        const handleMouseMove = (moveEvent: MouseEvent) => {
-            const deltaX = moveEvent.clientX - initialX;
-            const newNumColumns = Math.max(1, initialNumColumns + Math.floor(deltaX / 20));
-
-            // Create a new grid based on the existing one, but with the updated number of columns
+        if (newNumColumns !== initialNumColumns) {
             const updatedGrid = new Grid({
                 beats: grid.beats.map((beat, index) => ({
                     ...beat,
-                    // Ensure that we create a new beat object if the index is less than the newNumColumns
                     notes: index < newNumColumns ? beat.notes : {},
                 })),
                 numColumns: newNumColumns,
@@ -108,14 +103,22 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             });
 
             setGrid(gridIndex, updatedGrid);
-        };
+        }
+    }, 100);  // Throttle state updates to occur at most every 100ms
+
+    const handleResizerMouseDown = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const initialX = e.clientX;
+        const initialNumColumns = grid.numColumns;
+
+        const mouseMoveHandler = (moveEvent: MouseEvent) => handleMouseMove(moveEvent, initialX, initialNumColumns, grid);
 
         const handleMouseUp = () => {
-            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mousemove', mouseMoveHandler);
             window.removeEventListener('mouseup', handleMouseUp);
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mousemove', mouseMoveHandler);
         window.addEventListener('mouseup', handleMouseUp);
     };
 

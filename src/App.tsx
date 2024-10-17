@@ -26,13 +26,13 @@ const App: React.FC = () => {
         <section>
           <h1>MIDI Phase  Editor</h1>
           <p>
-            Select an input and output device to continue.
-          </p>
-          <p>
-            Drag a grid from the right to add or remove columns.
+            Allow the browser access to MIDI devices, and select an input and output device.
           </p>
           <p>
             Click a grid square to set a note, or use step input.
+          </p>
+          <p>
+            Drag a grid from the right to add or remove columns.
           </p>
           <p>
             CTRL-click a grid square to set velocity.
