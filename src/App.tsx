@@ -8,7 +8,6 @@ import DeviceSelector from './components/DeviceSelector';
 import PlayPauseButton from './components/PlayMIDI';
 import Grids from './components/Grids';
 import SaveMIDI from './components/SaveMIDI';
-import MIDIClockReporter from './components/MIDIClockReporter';
 // import UndoButton from './components/UndoButton';
 
 const App: React.FC = () => {
@@ -56,7 +55,6 @@ const App: React.FC = () => {
         </section>
 
         <Grids />
-        <MIDIClockReporter />
       </>
       }
 
