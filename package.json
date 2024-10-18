@@ -13,7 +13,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "echo Coming soon",
+    "test": "vitest --run",
     "deploy": "gh-pages -d dist/"
   },
   "dependencies": {
