@@ -5,10 +5,15 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 export default defineConfig({
   base: './',
-  publicDir: 'assets',
 
   build: {
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        // Customize the output directory structure
+        assetFileNames: 'assets/[name][extname]', // Control asset names
+      },
+    },
   },
 
   plugins: [
@@ -19,7 +24,7 @@ export default defineConfig({
         "name": "MIDI Phase Experiments",
         "short_name": "MIDI Phase",
         "start_url": ".",
-        "description": "Experiments in phasing MIDI with interferance patterns",
+        "description": "Experiments in phasing MIDI with interference patterns",
         "display": "standalone",
         "theme_color": "#000000",
         "background_color": "#242424",
@@ -48,7 +53,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        swDest: "assets/sw.js",
+        swDest: "dist/registerSW.js", // Set this to output directly to the dist folder
         runtimeCaching: [
           {
             urlPattern: /\.(?:png|svg)$/,
