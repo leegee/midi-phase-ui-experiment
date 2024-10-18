@@ -1,59 +1,82 @@
-// import React from 'react';
-// import { render, screen, fireEvent } from '@testing-library/react';
-// import GridInput from './GridInput';
-// import useMusicStore from '../store';
+import { describe, it, expect } from 'vitest';
+import { render, fireEvent } from '@testing-library/react';
+import GridInput from './GridInput';
+import { vi } from 'vitest';
+import { GridNote } from '../store';
 
-// // Mock the Zustand store module
-// jest.mock('../store');
+// Mock the store and any required props
+const mockDefaultVelocity = 78;
+const mockSetGrid = vi.fn();
+const mockUpdateNoteVelocity = vi.fn();
+const mockDeleteNoteFromGrid = vi.fn();
+const mockSetOrUpdateNoteInGrid = vi.fn(
+    (gridIndex: number, beatIndex: number, newNote: GridNote) => {
+        const notes: Record<number, GridNote> = grids[gridIndex].beats[beatIndex].notes;
+        if (!notes[newNote.pitch]) {
+            notes[newNote.pitch] = newNote;
+        } else {
+            delete notes[newNote.pitch];
+        }
+    }
+);
 
-// describe('GridInput Integration Test', () => {
-//     const mockSetGrid = jest.fn();
-//     const mockUpdateNoteVelocity = jest.fn();
-//     const mockSetOrUpdateNoteInGrid = jest.fn();
+const grids = [
+    {
+        numColumns: 4,
+        beats: [
+            { notes: {} },
+            { notes: {} },
+            { notes: {} },
+            { notes: {} },
+        ],
+        colour: '#ff0000',
+    },
+];
 
-//     beforeEach(() => {
-//         // Clear mock function calls before each test
-//         jest.clearAllMocks();
+// Mock the store with vi
+vi.mock('../store', () => ({
+    __esModule: true,
+    default: () => ({
+        grids,
+        setGrid: mockSetGrid,
+        updateNoteVelocity: mockUpdateNoteVelocity,
+        setOrUpdateNoteInGrid: mockSetOrUpdateNoteInGrid,
+        deleteNoteFromGrid: mockDeleteNoteFromGrid,
+        defaultVelocity: mockDefaultVelocity
+    }),
+}));
 
-//         jest.mocked(useMusicStore).mockReturnValue({
-//             grids: [{ beats: [{ notes: {} }], numColumns: 4, colour: 'blue' }],
-//             setGrid: mockSetGrid,
-//             updateNoteVelocity: mockUpdateNoteVelocity,
-//         });
-//     });
+describe('GridInput Component', () => {
+    it('renders the correct number of grid cells', () => {
+        const { container } = render(<GridInput gridIndex={0} />);
 
-//     test('renders the grid and toggles a note', () => {
-//         // Render the component
-//         render(<GridInput gridIndex={0} />);
+        // Check that there are the correct number of grid cells
+        const cells = container.querySelectorAll('.grid-cell');
+        expect(cells.length).toEqual(88 * 4); // 88 pitches * 4 columns
+    });
 
-//         // Check if the grid cells are rendered
-//         const cells = screen.getAllByRole('gridcell');
-//         expect(cells.length).toBe(88 * 4); // 88 pitches * 4 columns
+    it('toggles note on mouse down', () => {
+        const { container } = render(<GridInput gridIndex={0} />);
+        const firstCell = container.querySelector('.grid-cell');
 
-//         // Simulate clicking on a grid cell to toggle a note
-//         const cellToToggle = cells[40]; // Choose an arbitrary cell
-//         fireEvent.mouseDown(cellToToggle);
+        expect(firstCell).not.toBeNull();
 
-//         // Verify that the note is added
-//         expect(mockSetOrUpdateNoteInGrid).toHaveBeenCalledWith(0, expect.any(Number), {
-//             pitch: 40,
-//             velocity: 100, // Assuming default velocity
-//         });
-//     });
+        const expectedPitch = 87;
+        const expectedVelocity = mockDefaultVelocity;
 
-//     test('drags a note with CTRL pressed', () => {
-//         // Render the component
-//         render(<GridInput gridIndex={0} />);
+        // Simulate mouse down to add a note
+        fireEvent.mouseDown(firstCell!);
+        expect(mockSetOrUpdateNoteInGrid).toHaveBeenCalledWith(0, 0, { pitch: expectedPitch, velocity: expectedVelocity });
 
-//         // Start dragging a note
-//         const cellToDrag = screen.getAllByRole('gridcell')[40];
-//         fireEvent.mouseDown(cellToDrag, { ctrlKey: true });
+        // Check if the note was actually added to the grid
+        expect(grids[0].beats[0].notes).toHaveProperty(expectedPitch.toString()); // Ensure the note is added
 
-//         // Simulate dragging the note with mouse move
-//         fireEvent.mouseMove(window, { clientY: 50, clientX: 100 });
+        // Simulate mouse down again to remove the note
+        fireEvent.mouseDown(firstCell!);
+        expect(mockDeleteNoteFromGrid).toHaveBeenCalled(); // Check if the note was removed
 
-//         // Verify that the note's velocity was updated
-//         expect(mockUpdateNoteVelocity).toHaveBeenCalledTimes(1);
-//         expect(mockSetOrUpdateNoteInGrid).toHaveBeenCalled();
-//     });
-// });
+        // Check if the note was actually removed from the grid
+        expect(grids[0].beats[0].notes).not.toHaveProperty(expectedPitch.toString()); // Ensure the note is removed
+    });
+
+});
