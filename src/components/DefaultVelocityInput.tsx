@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 
 import useMusicStore from '../store';
 
-const BPMInput: React.FC = () => {
-    const { bpm, setBPM } = useMusicStore();
-    const [inputValue, setInputValue] = useState(bpm.toString());
+const DefaultVelocityInput: React.FC = () => {
+    const { defaultVelocity, setDefaultVelocity } = useMusicStore();
+    const [inputValue, setInputValue] = useState(defaultVelocity.toString());
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -13,27 +13,26 @@ const BPMInput: React.FC = () => {
     };
 
     const handleBlur = () => {
-        const newBPM = Number(inputValue);
-        if (!isNaN(newBPM) && newBPM > 0) {
-            setBPM(newBPM);
+        const newDefaultVelocity = Number(inputValue);
+        if (!isNaN(newDefaultVelocity) && newDefaultVelocity > 0) {
+            setDefaultVelocity(newDefaultVelocity);
         }
     };
 
     return (
         <label>
-            BPM:
+            Velocity:
             <input
-                title='Beats per minute'
-                className="bpm-input"
+                title='Default velocity'
                 type="number"
                 value={inputValue}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 min={1}
-                max={300}
+                max={127}
             />
         </label>
     );
 };
 
-export default BPMInput;
+export default DefaultVelocityInput;

@@ -9,6 +9,7 @@ import PlayPauseButton from './components/PlayMIDI';
 import Grids from './components/Grids';
 import SaveMIDI from './components/SaveMIDI';
 import UndoButton from './components/UndoButton';
+import DefaultVelocityInput from './components/DefaultVelocityInput';
 
 const App: React.FC = () => {
   const { error, selectedInput, selectedOutput } = useMIDI();
@@ -50,6 +51,7 @@ const App: React.FC = () => {
           <nav className='app-ctrls'>
             <PlayPauseButton />
             <BPMInput />
+            <DefaultVelocityInput />
             <UndoButton />
             <SaveMIDI />
             <DeviceSelector />

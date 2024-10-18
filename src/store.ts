@@ -28,6 +28,8 @@ export interface Beat {
 export interface MusicState {
     bpm: number;
     setBPM: (bpm: number) => void;
+    defaultVelocity: number;
+    setDefaultVelocity: (defaultVelocity: number) => void;
 
     grids: Grid[];
     setGrid: (gridIndex: number, grid: Grid) => void;
@@ -70,6 +72,12 @@ const useMusicStore = create<MusicState>((set, get) => ({
     setBPM: (bpm: number) => set((state) => {
         pushToUndoStack();
         return { ...state, bpm };
+    }),
+
+    defaultVelocity: 75,
+    setDefaultVelocity: (defaultVelocity: number) => set((state) => {
+        pushToUndoStack();
+        return { ...state, defaultVelocity };
     }),
 
     selectedInput: null,

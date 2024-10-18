@@ -27,3 +27,8 @@ main {
 .app-ctrls > * {
    margin: var(--midi-app-container-padding);
 }
+
+.app-ctrls label {
+  font-size: xx-small;
+  border: 1pt solid var(--midi-app-container-border);
+}

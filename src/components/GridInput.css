@@ -20,15 +20,15 @@
 }
 
 .grid-cell.active {
-    background-color: var(--selected-background);
+    background-color: var(--midi-app-selected-bg);
 }
 
 .grid-cell.highlight {
-    background-color: var(--midi-app-grid-current-beat-background); 
+    background-color: var(--midi-app-grid-current-beat-bg); 
 }
 
 .grid-cell.active.highlight {
-    background-color: var(--midi-app-grid-current-beat-selected-background);
+    background-color: var(--midi-app-grid-current-beat-selected-bg);
 }
 
 .resizer {

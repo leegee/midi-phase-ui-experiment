@@ -21,9 +21,9 @@ body {
   --midi-app-grid-cell-size: 20pt; 
   --midi-app-grid-bg: lightgray; 
   --midi-app-grid-border-clr: #555;
-  --selected-background: lightblue;
-  --midi-app-grid-current-beat-background: lightgreen;
-  --midi-app-grid-current-beat-selected-background: green;
+  --midi-app-selected-bg: lightblue;
+  --midi-app-grid-current-beat-bg: lightgreen;
+  --midi-app-grid-current-beat-selected-bg: green;
   --midi-app-toolbar-height: 3rem;
 }
 
