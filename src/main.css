@@ -19,7 +19,9 @@ body {
   --midi-app-container-border: 1pt solid grey;
 
   --midi-app-grid-cell-size: 20pt; 
-  --midi-app-grid-bg: lightgray; 
+  --midi-app-grid-bg: #444; 
+  --midi-app-grid-light-key: #666; 
+  --midi-app-grid-dark-key: #333; 
   --midi-app-grid-border-clr: #555;
   --midi-app-selected-bg: lightblue;
   --midi-app-grid-current-beat-bg: lightgreen;
@@ -30,4 +32,40 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+hr {
+  border-color: black;
+}
+
+input, button {
+  background-color: var(--midi-app-grid-dark-key); 
+  color: #aaa;
+}
+
+
+/* Scrollbar track (the background) */
+::-webkit-scrollbar {
+  width: 1em;
+}
+
+/* Scrollbar background (the track) */
+::-webkit-scrollbar-track {
+  background-color: #2e2e2e; 
+}
+
+/* Scrollbar handle (the thumb) */
+::-webkit-scrollbar-thumb {
+  background-color: #555; 
+  border: 1pt solid #2e2e2e; 
+}
+
+/* Scrollbar hover state */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #888; 
+}
+
+/* Scrollbar corner (between vertical and horizontal scrollbars) */
+::-webkit-scrollbar-corner {
+  background-color: #2e2e2e;
 }

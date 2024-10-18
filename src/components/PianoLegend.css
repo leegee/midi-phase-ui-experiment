@@ -2,8 +2,8 @@
 .key {
     display: flex;
     align-items: center;
-    background: white;
-    color: black;
+    background: var(--midi-app-grid-light-key);
+    color: var(--midi-app-grid-dark-key);
     border: 1px solid black;
     width: var(--midi-app-grid-cell-size); 
     height: var(--midi-app-grid-cell-size);
@@ -11,6 +11,6 @@
 }
 
 .black {
-    background: black;
-    color: white;
+    background: var(--midi-app-grid-dark-key);
+    color: var(--midi-app-grid-light-key);
 }
