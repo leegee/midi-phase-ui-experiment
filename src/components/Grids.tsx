@@ -5,7 +5,7 @@ import useMusicStore from '../store';
 import GridInput from './GridInput';
 import PianoLegend from './PianoLegend';
 import StepInput from './StepInput';
-import MergedGrid from './MergedGrid.tsc';
+import MergedGrid from './MergedGrid';
 import ClearGridButton from './ClearGridButton';
 import AddGridButton from './AddGridButton';
 import RemoveGridButton from './RemoveGridButton';
