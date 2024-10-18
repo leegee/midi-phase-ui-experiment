@@ -14,7 +14,7 @@ interface GridInputProps {
 
 
 const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
-    const { grids, setGrid, updateNoteVelocity, setOrUpdateNoteInGrid, deleteNoteFromGrid } = useMusicStore();
+    const { grids, setGrid, updateNoteVelocity, setOrUpdateNoteInGrid, deleteNoteFromGrid, defaultVelocity } = useMusicStore();
     const grid = grids[gridIndex];
     const gridRef = useRef<HTMLDivElement | null>(null);
     const cellRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: GRID_PITCH_RANGE }, () => Array(grid ? grid.numColumns : 0).fill(null)));
@@ -36,16 +36,16 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
             }
         } else {
             // Add a new note if it does not exist
-            const newNote: GridNote = { pitch, velocity: velocity || 75 };
+            const newNote: GridNote = { pitch, velocity: velocity || defaultVelocity };
             setOrUpdateNoteInGrid(gridIndex, beatIndex, newNote);
-            dispatchPlayNoteNowEvent(pitch, velocity || 75);
+            dispatchPlayNoteNowEvent(pitch, velocity || defaultVelocity);
         }
-    }, [gridIndex, setOrUpdateNoteInGrid, deleteNoteFromGrid, updateNoteVelocity, grids]);
+    }, [defaultVelocity, gridIndex, setOrUpdateNoteInGrid, deleteNoteFromGrid, updateNoteVelocity, grids]);
 
     const handleMouseDown = (pitch: number, e: React.MouseEvent<HTMLDivElement>) => {
         const beatIndex = Number(e.currentTarget.dataset.beat);
         if (e.ctrlKey) {
-            const velocity = Number(prompt('Enter new velocity (1-127)', '75'));
+            const velocity = Number(prompt('Enter new velocity (1-127)', defaultVelocity.toString()));
             if (velocity) {
                 toggleNote(pitch, beatIndex, velocity);
             }
