@@ -10,8 +10,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        // Customize the output directory structure
-        assetFileNames: 'assets/[name][extname]', // Control asset names
+        assetFileNames: 'assets/[name][extname]',
       },
     },
   },
@@ -30,22 +29,25 @@ export default defineConfig({
         "background_color": "#242424",
         "icons": [
           {
-            "src": "pwa-64x64.png",
-            "sizes": "64x64",
-            "type": "image/png"
-          },
-          {
-            "src": "pwa-192x192.png",
+            "src": "public/icons/manifest-icon-192.maskable.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
           },
           {
-            "src": "pwa-512x512.png",
+            "src": "public/icons/manifest-icon-192.maskable.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+          },
+          {
+            "src": "public/icons/manifest-icon-512.maskable.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
           },
           {
-            "src": "maskable-icon-512x512.png",
+            "src": "public/icons/manifest-icon-512.maskable.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
@@ -53,7 +55,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        swDest: "dist/registerSW.js", // Set this to output directly to the dist folder
+        swDest: "dist/registerSW.js",
         runtimeCaching: [
           {
             urlPattern: /\.(?:png|svg)$/,

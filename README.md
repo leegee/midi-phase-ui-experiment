@@ -14,6 +14,8 @@ A React UI to experiment with real-time phasing of MIDI rhythms and first use of
 
 [Demo](https://leegee.github.io/midi-phase-ui-experiment/)
 
+![](./README/Screenshot%202024-11-05%20154505.png)
+
 # To Do
 
 * Set cell units?
