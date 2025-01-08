@@ -1,6 +1,8 @@
 # MIDI Phase Rhythms UI
 
-A React UI to experiment with real-time phasing of MIDI rhythms and first use of zustand.
+Schillinger's resultants in the studio web browser....
+
+A React UI to experiment with real-time phasing of MIDI rhythms, and first (and last) use of Zustand.
 
 * Allow the browser access to MIDI devices, and select an input and output device.
 * Click a grid square to set a note, or use step input.
