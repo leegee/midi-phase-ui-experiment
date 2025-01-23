@@ -1,7 +1,7 @@
 {
   "name": "midi-phase-ui",
-  "description": "A React UI to experiment with real-time phasing of MIDI rhythms ala Schillinger",
-  "version": "0.1.0",
+  "description": "A React UI to experiment with real-time polytemporal phasing of MIDI rhythms ala Schillinger",
+  "version": "0.1.1",
   "private": true,
   "homepage": "https://leegee.github.io/midi-phase-ui-experiment",
   "keywords": [

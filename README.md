@@ -1,4 +1,4 @@
-# MIDI Phase Rhythms UI
+# MIDI Polytemporal Phase Rhythms UI
 
 Schillinger's resultants in the studio web browser....
 

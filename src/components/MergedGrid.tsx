@@ -5,11 +5,11 @@ import useMusicStore from '../store';
 const GRID_PITCH_RANGE = 88;
 
 const calculateOpacity = (velocity: number) => {
-    return velocity / 127; // Normalize velocity to opacity range [0, 1]
+    return velocity / 127;
 };
 
 const MergedGrid: React.FC = () => {
-    const gridRef = useRef<HTMLDivElement | null>(null);
+    // const gridRef = useRef<HTMLDivElement | null>(null);
     const { grids, mergedBeats, mergeGrids } = useMusicStore();
     const cellRefs = useRef<(HTMLDivElement | null)[][]>(
         Array.from({ length: GRID_PITCH_RANGE }, () => Array(mergedBeats.length).fill(null))
