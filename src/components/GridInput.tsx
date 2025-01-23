@@ -82,7 +82,6 @@ const GridInput: React.FC<GridInputProps> = ({ gridIndex }) => {
 
         window.addEventListener('SET_CURRENT_BEAT', handleCurrentBeatEvent as EventListener);
 
-        // Cleanup event listener on unmount
         return () => {
             window.removeEventListener('SET_CURRENT_BEAT', handleCurrentBeatEvent as EventListener);
         };

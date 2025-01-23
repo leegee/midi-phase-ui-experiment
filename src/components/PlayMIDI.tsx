@@ -35,11 +35,9 @@ const PlayPauseButton: React.FC = () => {
         }
 
         pitch += BASE_PITCH;
-        const currentTime = audioContextRef.current.currentTime; // Current time in seconds
+        const currentTime = audioContextRef.current.currentTime;
         const noteOnTime = currentTime; // Now
-        const noteOffTime = currentTime + intervalDurationSeconds; // After the duration
-
-        console.log(selectedOutput);
+        const noteOffTime = currentTime + intervalDurationSeconds;
 
         console.log(`Playing note: ${pitch}, velocity: ${velocity}, time: ${noteOnTime}`);
         selectedOutput.send([NOTE_ON + outputChannel, pitch, velocity], noteOnTime);
